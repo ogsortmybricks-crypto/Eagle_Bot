@@ -1,0 +1,306 @@
+text,label
+"A regular strike requires a friendly reminder first",es-strike-regular
+"Blue mark is given after issuing a regular strike",es-strike-regular
+"The timer for a regular strike is 5 minutes",es-strike-regular
+"ES learners receive 1 blue mark per regular strike",es-strike-regular
+"A friendly reminder must be given before any regular strike is issued",es-strike-regular
+"Regular strikes cannot be issued without a prior verbal reminder",es-strike-regular
+"The 5-minute reset timer applies to regular strikes in ES",es-strike-regular
+"Strike champions must warn learners before issuing a regular strike",es-strike-regular
+"A verbal reminder must precede every regular strike",es-strike-regular
+"Regular strikes result in a 5-minute reset and 1 blue mark",es-strike-regular
+"ES regular strikes start with a friendly reminder then a 5-minute timer",es-strike-regular
+"One blue mark is added each time a regular strike is issued in ES",es-strike-regular
+"Guardrail strikes are issued immediately without a reminder",es-strike-guardrail
+"A guardrail strike gives 2 red marks",es-strike-guardrail
+"The reset timer for a guardrail strike is 10 minutes",es-strike-guardrail
+"Physical aggression triggers an immediate guardrail strike in ES",es-strike-guardrail
+"ES guardrail strikes require no friendly reminder",es-strike-guardrail
+"2 red marks are added for each guardrail strike",es-strike-guardrail
+"Guardrail behaviors result in an immediate 10-minute reset",es-strike-guardrail
+"Safety violations in ES result in a guardrail strike",es-strike-guardrail
+"No warning is needed before issuing a guardrail strike",es-strike-guardrail
+"ES learners who commit guardrail offenses receive a 10-minute timer",es-strike-guardrail
+"A guardrail strike skips the reminder and goes straight to 10 minutes",es-strike-guardrail
+"Two red marks are recorded for every guardrail strike in Elementary Studio",es-strike-guardrail
+"ES learners who refuse to reset receive 1 penalty minute per minute of refusal",es-strike-refusal
+"Refusal minutes accumulate across the session",es-strike-refusal
+"A learner who refuses for more than 10 minutes loses the ability to give strikes",es-strike-refusal
+"Refusing to sit during the reset timer adds extra time to the clock",es-strike-refusal
+"Refusal tracking counts total minutes of non-compliance per session",es-strike-refusal
+"10 minutes of refusal in ES results in strike-giving privileges being revoked",es-strike-refusal
+"Each minute a learner refuses to reset adds 1 minute to their timer",es-strike-refusal
+"Refusal to reset is tracked separately from strike marks",es-strike-refusal
+"ES learners who refuse for over 10 minutes cannot issue strikes for the rest of the session",es-strike-refusal
+"Penalty minutes stack up if a learner keeps refusing during their reset",es-strike-refusal
+"Refusal to comply with a reset timer results in an extended penalty period",es-strike-refusal
+"Marks reset each session in Elementary Studio",es-strike-refusal
+"Hero's Promise must be recited at the start of each day",es-roes-promise
+"The Hero's Promise is said together at the beginning of every session",es-roes-promise
+"ES learners recite the Hero's Promise every morning",es-roes-promise
+"The promise is a daily commitment to learning and community",es-roes-promise
+"Reciting the Hero's Promise is a required part of the ES opening routine",es-roes-promise
+"The Hero's Promise sets the tone for each ES session",es-roes-promise
+"All ES learners participate in reciting the promise at the start of the day",es-roes-promise
+"The Hero's Promise reminds learners of their commitment to the tribe",es-roes-promise
+"ES sessions begin with the collective recitation of the Hero's Promise",es-roes-promise
+"The promise is recited aloud by every ES learner each morning",es-roes-promise
+"Learners must raise their hand before speaking during town hall",es-roes-conduct
+"Socratic discussion rules apply during all ES town hall sessions",es-roes-conduct
+"ES learners must use respectful language at all times",es-roes-conduct
+"Free time is earned by following studio expectations",es-roes-conduct
+"Classroom conduct standards are outlined in the ES rules of engagement",es-roes-conduct
+"ES learners are expected to follow the Socratic method during discussions",es-roes-conduct
+"Speaking out of turn during discussions results in a reminder",es-roes-conduct
+"ES conduct expectations apply throughout the entire studio session",es-roes-conduct
+"Learners may only speak when called upon during structured discussions",es-roes-conduct
+"Respecting others during discussions is a core ES expectation",es-roes-conduct
+"No interrupting others while they are speaking in ES",es-roes-conduct
+"ES learners are expected to listen actively during group discussions",es-roes-conduct
+"LGG stands for Low Grade Guardrail",ms-strike-lgg
+"The bottle lid is classified as an LGG offense",ms-strike-lgg
+"Low Grade Guardrail strikes are given without a reminder",ms-strike-lgg
+"LGG offenses result in specific consequences outlined in the MS strike page",ms-strike-lgg
+"The bottle lid rule is an MS-specific LGG trigger",ms-strike-lgg
+"A low grade guardrail is issued for minor but non-negotiable rule breaks in MS",ms-strike-lgg
+"Microwave misuse is considered an LGG offense",ms-strike-lgg
+"LGG is a separate strike category from regular and guardrail strikes in MS",ms-strike-lgg
+"Bottle lid violations result in an LGG strike in Middle School",ms-strike-lgg
+"Low grade guardrails carry specific consequences distinct from regular strikes",ms-strike-lgg
+"MS learners who leave bottle lids off receive an LGG",ms-strike-lgg
+"Bottle lid is now a warning first before an LGG is issued",ms-strike-lgg
+"Apology letters must be signed off by three strike champions",ms-strike-apology
+"MS learners must submit an apology letter after receiving a strike",ms-strike-apology
+"Apology letters must include an action plan",ms-strike-apology
+"Sign-off from three strike champions is required for apology letters",ms-strike-apology
+"An apology letter must be completed before privileges are restored",ms-strike-apology
+"The apology letter process requires peer review and sign-off",ms-strike-apology
+"Apology letters in MS must address the specific behavior that caused the strike",ms-strike-apology
+"Three champion signatures are required on every MS apology letter",ms-strike-apology
+"Apology letters must be reviewed and approved before a learner rejoins the group",ms-strike-apology
+"MS apology letters must be handwritten and include an action plan",ms-strike-apology
+"An apology letter with fewer than three sign-offs is not considered complete",ms-strike-apology
+"The apology letter must be submitted to the strike champion before returning to normal activity",ms-strike-apology
+"Silent lunch timer runs for 30 minutes ending at 12:00",ms-strike-silent-lunch
+"Learners on silent lunch may not talk during the 30-minute period",ms-strike-silent-lunch
+"Silent lunch is a consequence for receiving a strike in MS",ms-strike-silent-lunch
+"MS strike consequences include a 30-minute silent lunch",ms-strike-silent-lunch
+"Silent lunch begins immediately when the lunch period starts",ms-strike-silent-lunch
+"A learner with a strike must sit in the designated silent lunch area",ms-strike-silent-lunch
+"Silent lunch lasts 30 minutes and ends at noon",ms-strike-silent-lunch
+"During silent lunch learners may not interact with other learners",ms-strike-silent-lunch
+"The silent lunch timer is 30 minutes and resets each session",ms-strike-silent-lunch
+"MS learners who have been struck must observe a 30-minute silent lunch",ms-strike-silent-lunch
+"Talking during silent lunch extends the consequence",ms-strike-silent-lunch
+"Silent lunch is served in a separate designated area from the rest of the studio",ms-strike-silent-lunch
+"Learners must complete their quest goals before free time",ms-rules-academics
+"Core skills must be demonstrated each session",ms-rules-academics
+"Quest projects must be submitted on time",ms-rules-academics
+"MS learners are accountable for their academic progress each session",ms-rules-academics
+"Failing to meet quest goals affects eligibility",ms-rules-academics
+"Learners who fall below grade requirements may receive an LGG",ms-rules-academics
+"Core skills are reviewed at the end of each session",ms-rules-academics
+"Quest completion is required before a learner may participate in free activities",ms-rules-academics
+"MS learners must track their own academic progress",ms-rules-academics
+"Grade requirements must be maintained to remain in good standing",ms-rules-academics
+"Self-governance means MS learners are responsible for their own academic output",ms-rules-academics
+"Quest goals must be set and met each session without guide reminders",ms-rules-academics
+"Accountability partners check in at the start of each day",ms-rules-schedule
+"Morning launch begins each MS studio session",ms-rules-schedule
+"Closing circle is held at the end of each session",ms-rules-schedule
+"The daily flow includes morning launch, work time, and closing circle",ms-rules-schedule
+"Accountability partner check-ins happen every morning",ms-rules-schedule
+"MS learners follow a structured daily schedule each session",ms-rules-schedule
+"Morning launch sets the goals for the day",ms-rules-schedule
+"Closing circle allows learners to reflect on the session",ms-rules-schedule
+"The MS daily schedule begins with an accountability check-in",ms-rules-schedule
+"Session structure includes opening, work blocks, and closing",ms-rules-schedule
+"Accountability partners review each other's progress during closing circle",ms-rules-schedule
+"Morning launch includes goal-setting and squad check-ins",ms-rules-schedule
+"A learner who accumulates 2 or more strikes is banned from leadership positions for 5 weeks",positions-eligibility
+"10 or more marks in a session makes a learner ineligible for leadership",positions-eligibility
+"Learners must be eligible to hold any leadership position",positions-eligibility
+"Ineligible learners may not run for or hold any position",positions-eligibility
+"A learner with 2 black marks is ineligible for MS leadership roles",positions-eligibility
+"ES learners with 10 blue marks cannot hold a leadership position",positions-eligibility
+"Position eligibility resets after 5 weeks following a ban",positions-eligibility
+"Strike champions lose their position after becoming ineligible",positions-eligibility
+"Eligibility is checked before each election cycle",positions-eligibility
+"A learner who is banned from positions cannot serve in any leadership role",positions-eligibility
+"Learners with 10 or more red marks are ineligible for ES leadership positions",positions-eligibility
+"Becoming ineligible mid-session results in immediate removal from a position",positions-eligibility
+"The tribe town hall leader facilitates whole-school discussions",positions-townhall
+"The backup leader steps in when the primary is absent",positions-townhall
+"The town hall secretary records all notes from each session",positions-townhall
+"The tribe town hall leader enforces Socratic discussion rules",positions-townhall
+"MS town hall leader facilitates Middle School sessions",positions-townhall
+"ES town hall leader runs Elementary Studio town halls",positions-townhall
+"The backup secretary takes over when the primary secretary is absent",positions-townhall
+"Town hall staff must coordinate before each session",positions-townhall
+"The tribe town hall leader assistant helps manage speaking order",positions-townhall
+"Backup town hall leaders must be prepared to step in at any time",positions-townhall
+"The tribe town hall secretary is responsible for publishing notes after each session",positions-townhall
+"The ES town hall backup covers when the primary ES leader is unavailable",positions-townhall
+"The strike champion must give a friendly reminder before issuing a regular strike",positions-strike-staff
+"ES strike champion manages the mark and strike system for Elementary Studio",positions-strike-staff
+"MS strike champion oversees the apology letter sign-off process",positions-strike-staff
+"Strike backups step in when the primary champion is absent",positions-strike-staff
+"The strike champion is responsible for tracking all marks during a session",positions-strike-staff
+"ES has one strike champion and three backup positions",positions-strike-staff
+"MS strike champion must sign off on all apology letters",positions-strike-staff
+"Strike champions may not issue strikes to themselves",positions-strike-staff
+"The strike champion role requires the holder to be eligible",positions-strike-staff
+"Backup strike champions must be ready to assume the role at any time",positions-strike-staff
+"The ES strike champion tracks blue and red marks throughout each session",positions-strike-staff
+"MS strike backups share sign-off duties when the champion is unavailable",positions-strike-staff
+"No physical aggression of any kind is permitted",shared-safety
+"Physical violence results in an immediate guardrail strike",shared-safety
+"Bullying or harassment is a non-negotiable guardrail offense",shared-safety
+"Destruction of property is a guardrail behavior",shared-safety
+"Safety rules apply to all studios equally",shared-safety
+"Threatening language is considered a guardrail behavior",shared-safety
+"No hitting, pushing, or shoving is allowed under any circumstances",shared-safety
+"Physical altercations result in immediate removal from the studio",shared-safety
+"Property destruction is treated as a guardrail offense for both ES and MS",shared-safety
+"No learner may endanger the physical safety of another",shared-safety
+"Safety non-negotiables apply to every learner regardless of studio",shared-safety
+"Any act of physical aggression results in an immediate guardrail strike for all studios",shared-safety
+"Learners may not use phones during studio time",shared-phones
+"No phones are permitted during town hall sessions",shared-phones
+"Phone use is restricted to designated break times",shared-phones
+"Learners must put phones away before town hall begins",shared-phones
+"Using a phone during quests results in a warning",shared-phones
+"Phones must be stored in bags during all studio sessions",shared-phones
+"Phone usage during studio hours is not allowed for any learner",shared-phones
+"Learners caught using phones during sessions receive a reminder",shared-phones
+"No devices may be used during town hall discussions",shared-phones
+"Phones must be silenced and put away for the entire studio session",shared-phones
+"Both ES and MS learners must keep phones away during studio time",shared-phones
+"Earbuds and headphones follow the same rules as phones during town hall",shared-phones
+"Learners must clean up after themselves in the kitchen",shared-kitchen
+"Only designated learners may use the microwave",shared-kitchen
+"Food must not be left out in the lunchroom",shared-kitchen
+"Kitchen rules apply to all studios",shared-kitchen
+"Learners may not use others' food without permission",shared-kitchen
+"The microwave must be cleaned after each use",shared-kitchen
+"No food is allowed in the studio work areas",shared-kitchen
+"Lunchroom tables must be wiped after each meal",shared-kitchen
+"Learners who misuse the kitchen lose kitchen privileges",shared-kitchen
+"All kitchen items must be returned to their proper place after use",shared-kitchen
+"Dishes must be rinsed and placed in the drying rack after meals",shared-kitchen
+"Kitchen cleanup is the responsibility of every learner who uses it",shared-kitchen
+"Elections must have at least 2 candidates to proceed",election
+"Voting is anonymous and each learner may only vote once",election
+"A runoff election is held when two candidates are tied",election
+"The election booth is used to run fair anonymous elections",election
+"Learners must enter their name before casting a ballot",election
+"Only eligible learners may run as candidates for leadership positions",election
+"Election results are displayed on the results screen after polls close",election
+"A runoff is triggered automatically when candidates are tied",election
+"The expected voter count is set before the election begins",election
+"Election history is saved and viewable after each session",election
+"Polls must be closed by the admin before results are revealed",election
+"Studio must be specified before an election can begin",election
+"A minimum of 2 candidates is required to start an election",election
+"Each voter steps up individually to cast their ballot in private",election
+"Tied candidates go to a runoff round with the same voters",election
+"Members are added to the roster by the admin",roster
+"Learners can set their own studio from the roster page",roster
+"The roster displays all registered members of Triumph Academy",roster
+"New members must contact the town hall secretary to be added",roster
+"Studio assignment can be claimed by the learner directly from their card",roster
+"The roster shows each member's eligibility status",roster
+"Position holders are shown on their member card in the roster",roster
+"Marks and strikes are visible on member cards for admin review",roster
+"Learners without a studio assigned can claim one from the roster",roster
+"The roster tracks blue, red, and black marks for each member",roster
+"Admin manages all roster additions and removals",roster
+"Ineligible members are highlighted in the roster view",roster
+"Learners who need to be removed from the roster must be deleted by the admin",roster
+"A member's studio can only be changed once through self-claim on the roster",roster
+"Respect myself at all times",es-roes-promise
+"Respect others in words and actions",es-roes-promise
+"Respect the environment and studio materials",es-roes-promise
+"Work hard even when tasks feel challenging",es-roes-promise
+"Have fun while staying responsible",es-roes-promise
+"Commit to my goals and follow through",es-roes-promise
+"Take my education seriously",es-roes-promise
+"Hold others accountable respectfully",es-roes-promise
+"Pick up after myself in the studio",es-roes-conduct
+"Do not distract or annoy other learners",es-roes-conduct
+"Wait patiently for toys and share them",es-roes-conduct
+"Offer forgiveness when appropriate",es-roes-conduct
+"Do not yell in the studio",es-roes-conduct
+"Place shoes and backpacks against the wall",es-roes-conduct
+"No swinging sticks during outside time",es-roes-conduct
+"Bring inside anything taken outside",es-roes-conduct
+"Cover the sandbox when finished",es-roes-conduct
+"Swings and chairs are first-come, first-served",es-roes-conduct
+"A regular strike is issued for breaking a Hero’s Promise",es-strike-regular
+"A regular strike requires a friendly reminder first",es-strike-regular
+"A regular strike results in a five-minute reset",es-strike-regular
+"One regular strike equals one tally on both boards",es-strike-regular
+"A guardrail strike is issued for physical harm",es-strike-guardrail
+"A guardrail strike is issued for emotional harm or threats",es-strike-guardrail
+"A guardrail strike results in a ten-minute reset",es-strike-guardrail
+"A guardrail strike equals two tallies on both boards",es-strike-guardrail
+"Exiting the patio without a guide results in an automatic guardrail strike",es-strike-guardrail
+"For every minute refused, one minute is added to reset time",es-strike-refusal
+"Refusal resets cannot exceed twenty minutes",es-strike-refusal
+"Five minutes of refusal removes Prodigy for one week",es-strike-refusal
+"Ten minutes of refusal removes the right to give strikes for one week",es-strike-refusal
+"Fifteen minutes of refusal results in losing Fun Friday",es-strike-refusal
+"Ten ES marks make a learner ineligible for leadership",positions-eligibility
+"Leadership eligibility is lost upon reaching mark limits",positions-eligibility
+"If you receive a strike, you must sit alone at lunch",ms-strike-silent-lunch
+"During a strike lunch, you must remain silent for thirty minutes",ms-strike-silent-lunch
+"Strike lunch ends at 12:00",ms-strike-silent-lunch
+"A guardrail strike requires writing a letter to your parents",ms-strike-apology
+"Apology letters must include proper grammar and an explanation",ms-strike-apology
+"Apology letters must include an apology to the school and affected person",ms-strike-apology
+"A parent must sign the apology letter",ms-strike-apology
+"The apology must be approved by three strike champions",ms-strike-apology
+"If the apology is insufficient, the learner loses the next Fun Friday",ms-strike-apology
+"Failure to replace a bottle lid may result in a Low Grade Guardrail Strike",ms-strike-lgg
+"Abandoning the microwave while heating food may result in an LGG",ms-strike-lgg
+"Setting the microwave over two minutes may result in an LGG",ms-strike-lgg
+"A strike equals one mark in MS",ms-strikes
+"A guardrail strike equals two standard strikes in MS",ms-strikes
+"Two marks remove the ability to give strikes",ms-strikes
+"Strike counts reset at the beginning of each session",ms-strikes
+"Half the majority must vote to approve a strike",ms-strikes
+"Learners must complete Lexia PowerUp for reading advancement",ms-rules-academics
+"Pre-Algebra badges must be completed for math advancement",ms-rules-academics
+"Algebra Basics must be completed for promotion",ms-rules-academics
+"Full-time learners must earn two new badges per session",ms-rules-academics
+"Part-time learners must earn one new badge per session",ms-rules-academics
+"Accountability partners must complete Writer’s Workshop",ms-rules-schedule
+"Accountability partners must complete Quest",ms-rules-schedule
+"Accountability partners must complete Journal work",ms-rules-schedule
+"Accountability partners must complete weekly core goals",ms-rules-schedule
+"If both accountability partners fail required work, both lose Fun Friday",ms-rules-schedule
+"The Tribe Town Hall Leader facilitates discussions",positions-townhall
+"The MS Town Hall Leader oversees middle school town hall",positions-townhall
+"The ES Town Hall Leader oversees elementary town hall",positions-townhall
+"A revote requires a logical argument and support from two learners",election
+"Town Hall operates as a Socratic for ES and MS",positions-townhall
+"ES Strike Champions review apology letters",positions-strike-staff
+"MS Strike Champions approve strike documentation",positions-strike-staff
+"The highest-ranking strike champion holds letters if others are absent",positions-strike-staff
+"Only the Studio Champion checks learners off",positions
+"There are always three Expo Managers regardless of enrollment size",positions
+"Managers choose food each session",positions
+"Managerial consultants must have four expos of experience",positions
+"Computers must be carried with two hands",shared-safety
+"Computers may only be used on the covered patio outside",shared-safety
+"Computers must not be left unattended on stairs or soft furniture",shared-safety
+"If a rule violation breaks a computer, a twenty-minute strike is issued",shared-safety
+"Never sandwich objects inside a closing laptop",shared-safety
+"No phones may be used during studio time",shared-phones
+"Programming the microwave beyond two minutes is prohibited",shared-kitchen
+"Learners must not abandon the microwave while heating food",shared-kitchen
+"Removing items from another learner’s cubby without permission is prohibited",shared-roes
+"Placing unknown items in another learner’s cubby is prohibited",shared-roes
+"Touching another learner’s cubby without permission results in a strike",shared-roes
+"No food may be placed in Lost and Found",shared-roes
+"Verify ownership before placing items in Lost and Found",shared-roes

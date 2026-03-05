@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triumph Academy - Constitution Wiki</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="home-logo-wrap">
+    <img src="Eagle_Bot.png" alt="Eagle Bot" class="home-logo">
+  </div>
+  <h1>Triumph Academy Constitution Wiki</h1>
+  <p class="page-desc">The official reference for rules, strike systems, and leadership positions across all studios.</p>
+
+  <div class="search-container">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" class="search-input" id="search-input" placeholder="Search the wiki..." autocomplete="off">
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <h2>Elementary Studio</h2>
+  <div class="section-grid">
+    <a class="section-card" href="es-strikes.html">
+      <h3>ES Strike System</h3>
+      <p>Regular Strike &bull; Guardrail Strike &bull; Refusal</p>
+    </a>
+    <a class="section-card" href="es-roes.html">
+      <h3>ES Rules of Engagement</h3>
+      <p>Hero's Promise &bull; Classroom Conduct</p>
+    </a>
+  </div>
+
+  <h2>Middle School</h2>
+  <div class="section-grid">
+    <a class="section-card" href="ms-strikes.html">
+      <h3>MS Strike System</h3>
+      <p>Silent Lunch &bull; Apology Letter &bull; Low Grade Guardrail (LGG)</p>
+    </a>
+    <a class="section-card" href="ms-rules.html">
+      <h3>MS Academics &amp; Schedule</h3>
+      <p>Academics &bull; Schedule &amp; Accountability Partners</p>
+    </a>
+  </div>
+
+  <h2>Positions</h2>
+  <div class="section-grid">
+    <a class="section-card" href="positions.html">
+      <h3>Leadership Positions</h3>
+      <p>Eligibility &bull; Town Hall &bull; Strike Staff &bull; Other Positions</p>
+    </a>
+  </div>
+
+  <h2>Shared</h2>
+  <div class="section-grid">
+    <a class="section-card" href="shared-roes.html">
+      <h3>Shared ROEs</h3>
+      <p>Safety &bull; Phones &bull; Kitchen &bull; Shared Spaces</p>
+    </a>
+  </div>
+</main>
+
+<script src="nav.js"></script>
+<script>
+// Simple wiki search
+const searchIndex = [
+  { title: 'Regular Strike (ES)', page: 'ES Strike System', href: 'es-strike-regular.html', text: 'Regular strike 5-minute reset 1 blue mark friendly reminder required Hero Promise Elementary Studio' },
+  { title: 'Guardrail Strike (ES)', page: 'ES Strike System', href: 'es-strike-guardrail.html', text: 'Guardrail strike 10-minute reset 2 red marks safety violations no reminder needed patio physical harm threats Elementary Studio' },
+  { title: 'Refusal During Reset (ES)', page: 'ES Strike System', href: 'es-strike-refusal.html', text: 'refusal minutes penalty Prodigy Fun Friday lost ability give strikes 5 10 15 minutes timer Elementary Studio' },
+  { title: "Hero's Promise (ES)", page: 'ES Rules of Engagement', href: 'es-roes-promise.html', text: "Hero Promise respect myself others environment work hard fun responsible commit goals education accountable recite daily morning" },
+  { title: 'Classroom Conduct (ES)', page: 'ES Rules of Engagement', href: 'es-roes-conduct.html', text: 'conduct studio sandbox swings outside shoes backpack town hall Socratic raise hand no interrupting yell free time Elementary Studio' },
+  { title: 'Silent Lunch (MS)', page: 'MS Strike System', href: 'ms-strike-silent-lunch.html', text: 'Silent lunch 30 minutes 12:00 sit alone designated area no talking no interacting extends Middle School' },
+  { title: 'Apology Letter (MS)', page: 'MS Strike System', href: 'ms-strike-apology.html', text: 'apology letter handwritten parent sign 3 three strike champion sign-offs action plan grammar insufficient Fun Friday Middle School' },
+  { title: 'Low Grade Guardrail (LGG)', page: 'MS Strike System', href: 'ms-strike-lgg.html', text: 'Low Grade Guardrail LGG bottle lid microwave abandon two minutes warning separate category Middle School' },
+  { title: 'MS Academics', page: 'MS Academics & Schedule', href: 'ms-rules-academics.html', text: 'quest core skills Lexia PowerUp Pre-Algebra Algebra Basics badges full-time part-time session grade requirements Middle School' },
+  { title: 'MS Schedule & Accountability Partners', page: 'MS Academics & Schedule', href: 'ms-rules-schedule.html', text: 'accountability partners morning launch closing circle Writers Workshop Quest Journal weekly core goals Fun Friday Middle School' },
+  { title: 'Position Eligibility', page: 'Leadership Positions', href: 'positions-eligibility.html', text: 'eligibility 10 marks 2 strikes 5 week ban ineligible leadership position ES MS blue red black' },
+  { title: 'Town Hall Positions', page: 'Leadership Positions', href: 'positions-townhall.html', text: 'town hall leader secretary backup Tribe MS ES Socratic facilitates whole school discussion notes' },
+  { title: 'Strike Staff Positions', page: 'Leadership Positions', href: 'positions-strike-staff.html', text: 'strike champion backup ES MS apology sign-off marks track cannot strike themselves highest ranking' },
+  { title: 'Other Positions', page: 'Leadership Positions', href: 'positions-other.html', text: 'studio champion expo manager MC check off three managers food managerial consultant four expos' },
+  { title: 'Safety Rules', page: 'Shared ROEs', href: 'shared-safety.html', text: 'safety guardrail physical aggression bullying harassment threatening property destruction computer two hands patio laptop' },
+  { title: 'Phone Rules', page: 'Shared ROEs', href: 'shared-phones.html', text: 'phones devices earbuds headphones studio time town hall bags silenced break time warning reminder' },
+  { title: 'Kitchen Rules', page: 'Shared ROEs', href: 'shared-kitchen.html', text: 'kitchen microwave cleanup lunchroom food tables dishes two minutes abandon bottle lid LGG' },
+  { title: 'Shared Space Rules', page: 'Shared ROEs', href: 'shared-spaces.html', text: 'cubby cubbies lost found food permission touching strike ownership verify' },
+];
+
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', () => {
+  const query = searchInput.value.trim().toLowerCase();
+  if (query.length < 2) {
+    searchResults.classList.remove('open');
+    return;
+  }
+
+  const matches = searchIndex.filter(item =>
+    item.title.toLowerCase().includes(query) ||
+    item.text.toLowerCase().includes(query)
+  );
+
+  if (matches.length === 0) {
+    searchResults.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:0.9rem;">No results found.</div>';
+  } else {
+    searchResults.innerHTML = matches.map(m => {
+      const snippet = highlightMatch(m.text, query);
+      return `<a class="search-result" href="${m.href}">
+        <div class="result-title">${highlightMatch(m.title, query)}</div>
+        <div class="result-page">${m.page}</div>
+        <div class="result-snippet">${snippet}</div>
+      </a>`;
+    }).join('');
+  }
+  searchResults.classList.add('open');
+});
+
+searchInput.addEventListener('blur', () => {
+  setTimeout(() => searchResults.classList.remove('open'), 200);
+});
+
+searchInput.addEventListener('focus', () => {
+  if (searchInput.value.trim().length >= 2) {
+    searchResults.classList.add('open');
+  }
+});
+
+function highlightMatch(text, query) {
+  const idx = text.toLowerCase().indexOf(query);
+  if (idx === -1) return text.length > 80 ? text.substring(0, 80) + '...' : text;
+  const start = Math.max(0, idx - 30);
+  const end = Math.min(text.length, idx + query.length + 40);
+  let snippet = (start > 0 ? '...' : '') + text.substring(start, end) + (end < text.length ? '...' : '');
+  return snippet.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
+}
+</script>
+</body>
+</html>

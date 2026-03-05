@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask the Constitution - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .chat-container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .chat-messages {
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid var(--surface2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: var(--surface);
+  }
+  .chat-msg {
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+  }
+  .chat-msg.user { justify-content: flex-end; }
+  .chat-msg .msg-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .chat-msg.user .msg-bubble {
+    background: var(--primary);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-msg.assistant .msg-bubble {
+    background: var(--surface2);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+  .chat-msg .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .chat-msg.user .msg-avatar { background: var(--primary); color: #fff; }
+  .chat-msg.assistant .msg-avatar { background: var(--surface2); }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--surface2);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+  }
+  .chat-input-row input:focus { border-color: var(--primary); }
+  .chat-input-row button {
+    padding: 12px 20px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .chat-input-row button:disabled { opacity: 0.5; cursor: default; }
+  .typing-indicator {
+    display: inline-flex;
+    gap: 4px;
+    padding: 8px 14px;
+  }
+  .typing-indicator span {
+    width: 6px;
+    height: 6px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: typingBounce 1.2s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+  .empty-chat {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+  }
+  .empty-chat .chat-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .suggested-questions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .suggested-q {
+    padding: 6px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--surface2);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .suggested-q:hover { border-color: var(--primary); }
+</style>
+</head>
+<body>
+
+<main class="main-content">
+  <div class="breadcrumbs">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span>Ask the Constitution</span>
+  </div>
+
+  <h1>Ask the Constitution <span class="badge badge-shared">AI Assistant</span></h1>
+  <p class="page-desc">Ask questions about rules, strikes, positions, or any part of the Triumph Academy constitution. The AI reads the full wiki to give you accurate answers.</p>
+
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-chat" id="emptyChat">
+        <div class="chat-icon">📜</div>
+        <p>Ask anything about the Triumph Academy constitution.</p>
+        <div class="suggested-questions">
+          <button class="suggested-q" onclick="askSuggested(this)">How do ES strikes work?</button>
+          <button class="suggested-q" onclick="askSuggested(this)">What makes someone ineligible for a position?</button>
+          <button class="suggested-q" onclick="askSuggested(this)">What are the rules about phones?</button>
+          <button class="suggested-q" onclick="askSuggested(this)">How does Town Hall work?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Ask about the constitution…" onkeydown="if(event.key==='Enter')sendMessage()">
+      <button id="sendBtn" onclick="sendMessage()">Ask</button>
+    </div>
+  </div>
+</main>
+
+<script src="nav.js"></script>
+<script>
+  var SERVER = window.location.origin;
+  var history = [];
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatMessage(text) {
+    var html = escHtml(text);
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\n/g, '<br>');
+    return html;
+  }
+
+  function addMessage(role, content) {
+    var container = document.getElementById('chatMessages');
+    var empty = document.getElementById('emptyChat');
+    if (empty) empty.remove();
+
+    var avatar = role === 'user' ? '👤' : '📜';
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    div.innerHTML =
+      (role === 'assistant' ? '<div class="msg-avatar">' + avatar + '</div>' : '') +
+      '<div class="msg-bubble">' + formatMessage(content) + '</div>' +
+      (role === 'user' ? '<div class="msg-avatar">' + avatar + '</div>' : '');
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+  }
+
+  function showTyping() {
+    var container = document.getElementById('chatMessages');
+    var div = document.createElement('div');
+    div.className = 'chat-msg assistant';
+    div.id = 'typingMsg';
+    div.innerHTML = '<div class="msg-avatar">📜</div><div class="msg-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    var el = document.getElementById('typingMsg');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    var input = document.getElementById('chatInput');
+    var question = input.value.trim();
+    if (!question) return;
+
+    input.value = '';
+    addMessage('user', question);
+
+    var btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    input.disabled = true;
+    showTyping();
+
+    try {
+      var token = localStorage.getItem('learnerToken');
+      var res = await fetch(SERVER + '/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-learner-token': token
+        },
+        body: JSON.stringify({ question: question, history: history })
+      });
+
+      var data = await res.json();
+      removeTyping();
+
+      if (data.answer) {
+        addMessage('assistant', data.answer);
+        history.push({ role: 'user', content: question });
+        history.push({ role: 'assistant', content: data.answer });
+        if (history.length > 20) history = history.slice(-20);
+      } else {
+        addMessage('assistant', 'Sorry, I could not get an answer. ' + (data.error || ''));
+      }
+    } catch (err) {
+      removeTyping();
+      addMessage('assistant', 'Connection error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }
+  }
+
+  function askSuggested(el) {
+    document.getElementById('chatInput').value = el.textContent;
+    sendMessage();
+  }
+</script>
+</body>
+</html>

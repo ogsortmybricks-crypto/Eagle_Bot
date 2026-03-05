@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Your Account - Triumph Academy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .invite-wrap {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .invite-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 40px 36px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .invite-icon { font-size: 3rem; margin-bottom: 12px; }
+  .invite-card h2 { color: var(--accent); margin: 0 0 6px; font-size: 1.5rem; }
+  .invite-card .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
+  .invite-email {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 24px;
+    border: 1px solid var(--surface2);
+  }
+  .field-group { margin-bottom: 16px; text-align: left; }
+  .field-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .invite-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    display: none;
+    text-align: left;
+  }
+  .invite-success {
+    display: none;
+    text-align: center;
+  }
+  .invite-success .check { font-size: 3rem; margin-bottom: 12px; }
+  .invite-success h3 { color: var(--green); margin: 0 0 8px; }
+  .invite-success p { color: var(--text-muted); font-size: 0.9rem; }
+  .pw-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<main style="margin-left:0">
+  <div class="invite-wrap">
+    <div class="invite-card">
+      <!-- Loading state -->
+      <div id="stateLoading">
+        <div class="invite-icon">⏳</div>
+        <h2>Verifying link…</h2>
+        <p class="subtitle">Please wait.</p>
+      </div>
+
+      <!-- Error state -->
+      <div id="stateError" style="display:none">
+        <div class="invite-icon">❌</div>
+        <h2>Link Invalid</h2>
+        <p class="subtitle" id="errorMsg">This invitation link is not valid.</p>
+        <a href="index.html" class="btn btn-secondary" style="margin-top:12px;display:inline-block;text-decoration:none;">Go to Wiki</a>
+      </div>
+
+      <!-- Set password form -->
+      <div id="stateForm" style="display:none">
+        <div class="invite-icon">🎉</div>
+        <h2 id="welcomeName">Welcome!</h2>
+        <p class="subtitle">Create a password to activate your account.</p>
+        <div class="invite-email" id="inviteEmail"></div>
+
+        <div class="invite-error" id="formError"></div>
+
+        <div class="field-group">
+          <label>Password</label>
+          <input class="field-input" type="password" id="pw1" placeholder="At least 8 characters"
+                 onkeydown="if(event.key==='Enter') document.getElementById('pw2').focus()">
+          <div class="pw-hint">Minimum 8 characters</div>
+        </div>
+        <div class="field-group">
+          <label>Confirm Password</label>
+          <input class="field-input" type="password" id="pw2" placeholder="Repeat password"
+                 onkeydown="if(event.key==='Enter') acceptInvite()">
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="acceptInvite()" id="submitBtn">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Success state -->
+      <div class="invite-success" id="stateSuccess">
+        <div class="check">✅</div>
+        <h3>Account Created!</h3>
+        <p>You're logged in and ready to go. Redirecting to the wiki…</p>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  const API = window.location.origin;
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  function show(id) {
+    ['stateLoading','stateError','stateForm','stateSuccess'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? '' : 'none';
+    });
+  }
+
+  async function init() {
+    if (!token) {
+      document.getElementById('errorMsg').textContent = 'No invitation token found in this link.';
+      show('stateError');
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/api/invitations/${token}`);
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById('errorMsg').textContent = data.error || 'Invalid invitation link.';
+        show('stateError');
+        return;
+      }
+      document.getElementById('welcomeName').textContent = `Welcome, ${data.name}!`;
+      document.getElementById('inviteEmail').textContent = data.email;
+      show('stateForm');
+    } catch (e) {
+      document.getElementById('errorMsg').textContent = 'Could not connect to server.';
+      show('stateError');
+    }
+  }
+
+  async function acceptInvite() {
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    const errEl = document.getElementById('formError');
+    errEl.style.display = 'none';
+
+    if (pw1.length < 8) {
+      errEl.textContent = 'Password must be at least 8 characters.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (pw1 !== pw2) {
+      errEl.textContent = 'Passwords do not match.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'Creating account…';
+
+    try {
+      const res = await fetch(`${API}/api/invitations/${token}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw1 })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('learnerToken', data.learnerToken);
+        localStorage.setItem('userName', data.user.name);
+        localStorage.setItem('userStudio', data.user.studio || '');
+        localStorage.setItem('userRole', 'learner');
+        localStorage.setItem('userPositions', JSON.stringify(data.user.positions || []));
+        show('stateSuccess');
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+      } else {
+        errEl.textContent = data.error || 'Failed to create account.';
+        errEl.style.display = 'block';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').textContent = 'Create Account';
+      }
+    } catch (e) {
+      errEl.textContent = 'Server error. Please try again.';
+      errEl.style.display = 'block';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = 'Create Account';
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

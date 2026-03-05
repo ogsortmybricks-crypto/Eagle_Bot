@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strike Staff Positions - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<main class="main-content">
+  <div class="breadcrumbs"><a href="index.html">Home</a><span class="sep">/</span><a href="positions.html">Leadership Positions</a><span class="sep">/</span><span>Strike Staff</span></div>
+  <h1>Strike Staff Positions <span class="badge badge-shared">All Studios</span></h1>
+  <p class="page-desc">Strike Champion and backup positions for ES and MS.</p>
+  <p>The strike champion role requires the holder to be eligible. Strike champions may not issue strikes to themselves. Backup strike champions must be ready to assume the role at any time. The highest-ranking strike champion holds apology letters if others are absent.</p>
+
+  <div class="position-accordion">
+    <div class="position-card" data-position="ES Strike Champion">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Strike Champion</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-champion">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Manages the mark and strike system for Elementary Studio.</li>
+        <li>Tracks blue and red marks throughout each session.</li>
+        <li>Issues friendly reminders before Regular Strikes.</li>
+        <li>Reviews apology letters.</li>
+        <li>Manages reset timers and tracks refusal minutes.</li>
+      </ul><p>ES has one Strike Champion and three backup positions.</p></div>
+    </div>
+
+    <div class="position-card" data-position="ES Strike Backup #1">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Strike Backup #1</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-1">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Steps in when the ES Strike Champion is absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="ES Strike Backup #2">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Strike Backup #2</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-2">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in when both ES Strike Champion and Backup #1 are absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="ES Strike Backup #3">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Strike Backup #3</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-3">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in when all other ES Strike staff are absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Strike Champion">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Strike Champion</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-strike-champion">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Oversees the apology letter sign-off process.</li>
+        <li>Must sign off on all apology letters.</li>
+        <li>Approves strike documentation.</li>
+        <li>Issues friendly reminders before Regular Strikes.</li>
+        <li>Tracks all marks during a session.</li>
+        <li>Manages silent lunch timers (30 minutes ending at 12:00).</li>
+        <li>Participates in voting on whether strikes are approved (half the majority required).</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Strike Backup #1">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Strike Backup #1</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-strike-backup-1">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in for the MS Strike Champion when absent.</li>
+        <li>Shares sign-off duties when the champion is unavailable.</li>
+        <li>Signs off on apology letters as part of the three-champion review.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Strike Backup #2">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Strike Backup #2</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-strike-backup-2">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in when both MS Strike Champion and Backup #1 are absent.</li>
+        <li>Signs off on apology letters as part of the three-champion review.</li>
+      </ul></div>
+    </div>
+  </div>
+</main>
+<script src="nav.js"></script><script src="amendments.js"></script>
+<script>
+(function() {
+  var POSITIONS_KEY = 'positionHolders';
+  window.togglePosition = function(header) {
+    var card = header.parentElement;
+    var isOpen = card.classList.contains('open');
+    card.parentElement.querySelectorAll('.position-card.open').forEach(function(c) { c.classList.remove('open'); });
+    if (!isOpen) card.classList.add('open');
+  };
+  function loadHolders() { try { var r = localStorage.getItem(POSITIONS_KEY); return r ? JSON.parse(r) : {}; } catch(e) { return {}; } }
+  function renderHolders() {
+    var holders = loadHolders();
+    document.querySelectorAll('.position-card').forEach(function(card) {
+      var position = card.getAttribute('data-position');
+      var badge = card.querySelector('.position-holder-badge');
+      if (!badge) return;
+      var holder = holders[position];
+      if (holder && holder.name) { badge.textContent = holder.name; badge.classList.add('filled'); badge.classList.remove('vacant'); }
+      else { badge.textContent = 'Vacant'; badge.classList.remove('filled'); badge.classList.add('vacant'); }
+    });
+  }
+  window.addEventListener('storage', function(e) { if (e.key === POSITIONS_KEY) renderHolders(); });
+  renderHolders();
+})();
+</script>
+</body></html>

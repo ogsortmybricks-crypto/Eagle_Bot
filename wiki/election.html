@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Election Booth - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ---- Election-specific styles ---- */
+
+  .election-phases { margin-bottom: 32px; }
+
+  .phase-indicator {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    background: var(--surface);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--surface2);
+  }
+  .phase-step {
+    flex: 1;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface);
+    transition: all 0.3s;
+    border-right: 1px solid var(--surface2);
+  }
+  .phase-step:last-child { border-right: none; }
+  .phase-step.active {
+    background: var(--accent);
+    color: white;
+  }
+  .phase-step.done {
+    background: var(--green);
+    color: white;
+  }
+  .phase-step .step-num {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+
+  .phase { display: none; }
+  .phase.active { display: block; }
+
+  /* ---- Admin login ---- */
+  .admin-gate {
+    max-width: 400px;
+    margin: 40px auto;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+    border: 1px solid var(--surface2);
+  }
+  .admin-gate h3 { color: var(--accent); margin: 0 0 8px; }
+  .admin-gate p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 18px; }
+  .admin-gate input {
+    width: 100%; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--surface2); background: var(--bg); color: var(--text);
+    font-size: 0.95rem; margin-bottom: 12px; outline: none; box-sizing: border-box;
+  }
+  .admin-gate input:focus { border-color: var(--accent); }
+  .gate-error { color: var(--red); font-size: 0.83rem; margin-bottom: 10px; display: none; }
+
+  /* ---- Setup ---- */
+  .setup-form label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+  .setup-form input, .setup-form select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+  }
+  .setup-form input:focus, .setup-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .candidate-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+  }
+  .candidate-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    border: 1px solid var(--surface2);
+  }
+  .candidate-list li button {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0 4px;
+  }
+  .add-candidate-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .add-candidate-row input { flex: 1; margin-bottom: 0; }
+
+  /* ---- Voting open ---- */
+  .voting-open-card {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid var(--green);
+    border-radius: 14px;
+    padding: 36px 28px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .voting-open-card .vote-icon { font-size: 3rem; margin-bottom: 12px; }
+  .voting-open-card h2 { color: var(--green); margin: 0 0 8px; }
+  .voting-open-card p { color: #166534; font-size: 0.95rem; margin: 0 0 16px; }
+  .vote-url {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 16px;
+    word-break: break-all;
+  }
+  .live-count {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .live-count-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- Results ---- */
+  .results-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .results-header h2 {
+    border: none;
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .results-position {
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .results-chart {
+    max-width: 600px;
+    margin: 0 auto 32px;
+  }
+  .chart-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .chart-name {
+    width: 120px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .chart-bar-track {
+    flex: 1;
+    height: 40px;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--surface2);
+    position: relative;
+  }
+  .chart-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.6s ease;
+    width: 0%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: white;
+    min-width: 0;
+  }
+  .chart-bar-fill.bar-1 { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .chart-bar-fill.bar-2 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+  .chart-bar-fill.bar-3 { background: linear-gradient(135deg, #ea580c, #f97316); }
+  .chart-bar-fill.bar-4 { background: linear-gradient(135deg, #16a34a, #22c55e); }
+  .chart-bar-fill.bar-5 { background: linear-gradient(135deg, #dc2626, #ef4444); }
+  .chart-bar-fill.bar-6 { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+  .winner-banner {
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.5s ease;
+  }
+  .winner-banner.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .winner-banner .crown { font-size: 2.5rem; margin-bottom: 8px; }
+  .winner-banner .winner-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .winner-banner .winner-label {
+    color: var(--green);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .tie-banner {
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #fef9c3, #fef3c7);
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .tie-banner .tie-icon { font-size: 2rem; margin-bottom: 8px; }
+  .tie-banner h3 { color: #92400e; margin: 0 0 8px; font-size: 1.3rem; }
+  .tie-banner p { color: #92400e; margin: 0 0 16px; font-size: 0.95rem; }
+
+  .results-stats {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .results-stat {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    border: 1px solid var(--surface2);
+    min-width: 120px;
+  }
+  .results-stat .stat-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .results-stat .stat-lbl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  /* ---- History ---- */
+  .history-section {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--surface2);
+  }
+  .history-section h2 {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    border: none;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .history-entry {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    border: 1px solid var(--surface2);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.9rem;
+  }
+  .history-trophy { font-size: 1.3rem; }
+  .history-details { flex: 1; }
+  .history-details strong { color: var(--accent); }
+  .history-date {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .history-votes {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+  .no-history {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 24px;
+    font-size: 0.9rem;
+  }
+
+  /* ---- Confetti canvas ---- */
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 300;
+  }
+
+  @media (max-width: 768px) {
+    .phase-step .step-num { font-size: 0.95rem; }
+    .phase-step { padding: 8px 6px; font-size: 0.72rem; }
+    .chart-name { width: 80px; font-size: 0.82rem; }
+    .results-header h2 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<main class="main-content">
+  <div class="breadcrumbs">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span>Election Booth</span>
+  </div>
+
+  <h1>Election Booth <span class="badge badge-shared">Admin Tool</span></h1>
+  <p class="page-desc">Run elections for leadership positions. Learners vote from their own devices at <strong>/vote.html</strong>.</p>
+
+  <!-- Admin Gate -->
+  <div id="adminGate">
+    <div class="admin-gate">
+      <div style="font-size:2rem;margin-bottom:10px;">🔐</div>
+      <h3>Admin Access Required</h3>
+      <p>Enter the admin password to manage elections.</p>
+      <div class="gate-error" id="gateError">Incorrect password.</div>
+      <input type="password" id="gatePassword" placeholder="Admin password"
+             onkeydown="if(event.key==='Enter') gateLogin()">
+      <button class="btn btn-primary" style="width:100%;" onclick="gateLogin()">Sign In</button>
+    </div>
+  </div>
+
+  <!-- Election Manager (shown after admin login) -->
+  <div id="electionManager" style="display:none;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
+      <div></div>
+      <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="gateLogout()">Sign Out</button>
+    </div>
+
+    <div class="phase-indicator">
+      <div class="phase-step active" id="pi-setup"><span class="step-num">1</span>Setup</div>
+      <div class="phase-step" id="pi-voting"><span class="step-num">2</span>Voting Open</div>
+      <div class="phase-step" id="pi-results"><span class="step-num">3</span>Results</div>
+    </div>
+
+    <!-- ======== SETUP PHASE ======== -->
+    <div class="phase active" id="phase-setup">
+      <div class="rule-card">
+        <div class="setup-form">
+          <label for="position-select">Position</label>
+          <select id="position-select">
+            <optgroup label="Town Hall Staff">
+              <option value="Tribe Town Hall Leader">Tribe Town Hall Leader</option>
+              <option value="Backup Tribe Town Hall Leader">Backup Tribe Town Hall Leader</option>
+              <option value="Tribe Town Hall Leader Assistant">Tribe Town Hall Leader Assistant</option>
+              <option value="Tribe Town Hall Secretary">Tribe Town Hall Secretary</option>
+              <option value="Tribe Town Hall Backup Secretary">Tribe Town Hall Backup Secretary</option>
+              <option value="MS Town Hall Leader">MS Town Hall Leader</option>
+              <option value="Backup MS Town Hall Leader">Backup MS Town Hall Leader</option>
+              <option value="ES Town Hall Leader">ES Town Hall Leader</option>
+              <option value="ES Town Hall Backup">ES Town Hall Backup</option>
+            </optgroup>
+            <optgroup label="Strike Staff">
+              <option value="ES Strike Champion">ES Strike Champion</option>
+              <option value="ES Strike Backup #1">ES Strike Backup #1</option>
+              <option value="ES Strike Backup #2">ES Strike Backup #2</option>
+              <option value="ES Strike Backup #3">ES Strike Backup #3</option>
+              <option value="MS Strike Champion">MS Strike Champion</option>
+              <option value="MS Strike Backup #1">MS Strike Backup #1</option>
+              <option value="MS Strike Backup #2">MS Strike Backup #2</option>
+            </optgroup>
+            <optgroup label="Studio Champions">
+              <option value="MS Studio Champion">MS Studio Champion</option>
+              <option value="MS Backup Studio Champion">MS Backup Studio Champion</option>
+            </optgroup>
+            <optgroup label="Expo Staff">
+              <option value="MS Expo Manager">MS Expo Manager</option>
+              <option value="ES Expo Manager">ES Expo Manager</option>
+              <option value="WG Expo Manager">WG Expo Manager</option>
+              <option value="Expo MC">Expo MC</option>
+            </optgroup>
+            <option value="custom">Custom position...</option>
+          </select>
+          <input type="text" id="position-custom" placeholder="Enter custom position name..." style="display:none">
+
+          <label for="studio-select">Studio (who can vote)</label>
+          <select id="studio-select">
+            <option value="ES">Elementary Studio (ES)</option>
+            <option value="MS">Middle School (MS)</option>
+            <option value="">Both Studios</option>
+          </select>
+
+          <label>Candidates</label>
+          <ul class="candidate-list" id="candidate-list"></ul>
+          <div class="add-candidate-row">
+            <select id="candidate-input" style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid var(--surface2);background:var(--bg);color:var(--text);font-size:0.95rem;box-sizing:border-box;">
+              <option value="">— Loading eligible learners… —</option>
+            </select>
+            <button class="btn btn-secondary" onclick="addCandidate()">Add</button>
+          </div>
+          <div id="eligibility-note" style="font-size:0.82rem;color:var(--text-muted);margin-top:-8px;margin-bottom:12px;display:none;"></div>
+
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+            <button class="btn btn-primary" onclick="openVoting()" id="start-btn" disabled>Open Voting</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== VOTING OPEN PHASE ======== -->
+    <div class="phase" id="phase-voting">
+      <div class="voting-open-card">
+        <div class="vote-icon">🗳️</div>
+        <h2>Voting Is Open!</h2>
+        <p>Learners can cast their ballot by visiting:</p>
+        <div class="vote-url" id="voteUrl"></div>
+        <div style="margin:12px 0;">
+          <div class="live-count" id="liveCount">0</div>
+          <div class="live-count-label">Votes Cast</div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn btn-primary" onclick="closePolls()">Close Polls & Show Results</button>
+      </div>
+    </div>
+
+    <!-- ======== RESULTS PHASE ======== -->
+    <div class="phase" id="phase-results">
+      <div class="results-header">
+        <h2>Election Results</h2>
+        <div class="results-position" id="results-position-label"></div>
+      </div>
+
+      <div class="results-chart" id="results-chart"></div>
+
+      <div id="winner-area"></div>
+
+      <div class="results-stats" id="results-stats"></div>
+
+      <div class="results-actions">
+        <button class="btn btn-secondary" onclick="resetElection()">New Election</button>
+      </div>
+    </div>
+
+    <!-- ======== HISTORY ======== -->
+    <div class="history-section">
+      <h2>Election History</h2>
+      <div id="history-list"><div class="no-history">No elections yet.</div></div>
+    </div>
+
+  </div><!-- end electionManager -->
+</main>
+
+<script src="nav.js"></script>
+<script>
+(function() {
+  var API = window.location.origin;
+  var adminToken = localStorage.getItem('adminToken') || null;
+  var candidates = [];
+  var pollInterval = null;
+  var currentElection = null; // server state
+
+  // ================================================================
+  // Admin gate
+  // ================================================================
+  async function gateLogin() {
+    var pw = document.getElementById('gatePassword').value;
+    document.getElementById('gateError').style.display = 'none';
+    try {
+      var res = await fetch(API + '/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      var data = await res.json();
+      if (res.ok) {
+        adminToken = data.token;
+        localStorage.setItem('adminToken', adminToken);
+        showManager();
+      } else {
+        document.getElementById('gateError').style.display = 'block';
+      }
+    } catch (e) {
+      document.getElementById('gateError').textContent = 'Server unreachable.';
+      document.getElementById('gateError').style.display = 'block';
+    }
+  }
+  window.gateLogin = gateLogin;
+
+  function gateLogout() {
+    fetch(API + '/api/admin/logout', {
+      method: 'POST', headers: { 'x-admin-token': adminToken }
+    }).catch(() => {});
+    adminToken = null;
+    localStorage.removeItem('adminToken');
+    document.getElementById('adminGate').style.display = '';
+    document.getElementById('electionManager').style.display = 'none';
+    stopPolling();
+  }
+  window.gateLogout = gateLogout;
+
+  async function checkAdminToken() {
+    if (!adminToken) return;
+    try {
+      var res = await fetch(API + '/api/activity', { headers: { 'x-admin-token': adminToken } });
+      if (res.ok) showManager();
+      else { adminToken = null; localStorage.removeItem('adminToken'); }
+    } catch (e) {}
+  }
+
+  function showManager() {
+    document.getElementById('adminGate').style.display = 'none';
+    document.getElementById('electionManager').style.display = '';
+    loadElectionState();
+    loadAllUsers();
+  }
+
+  // ================================================================
+  // Election state
+  // ================================================================
+  async function loadElectionState() {
+    try {
+      var res = await fetch(API + '/api/election/results', { headers: { 'x-admin-token': adminToken } });
+      if (!res.ok) return;
+      var data = await res.json();
+      currentElection = data;
+      syncPhaseUI(data);
+      renderHistory(data.history || []);
+    } catch (e) {}
+  }
+
+  function syncPhaseUI(data) {
+    if (data.phase === 'voting') {
+      setPhase('voting');
+      document.getElementById('liveCount').textContent = data.voteCount;
+      document.getElementById('voteUrl').textContent = window.location.origin + '/vote.html';
+      startPolling();
+    } else if (data.phase === 'results') {
+      setPhase('results');
+      showResults(data);
+    } else {
+      setPhase('setup');
+      renderCandidates();
+    }
+  }
+
+  // ================================================================
+  // Setup
+  // ================================================================
+  var posSelect = document.getElementById('position-select');
+  var posCustom = document.getElementById('position-custom');
+  var allUsers = [];
+
+  posSelect.addEventListener('change', function() {
+    posCustom.style.display = posSelect.value === 'custom' ? 'block' : 'none';
+    if (posSelect.value !== 'custom') {
+      var val = posSelect.value;
+      var studioSelect = document.getElementById('studio-select');
+      if (val.indexOf('ES ') === 0 || val.indexOf('ES Town') !== -1) studioSelect.value = 'ES';
+      else if (val.indexOf('MS ') === 0 || val.indexOf('MS Town') !== -1) studioSelect.value = 'MS';
+      else studioSelect.value = '';
+      refreshEligibleSelect();
+    }
+  });
+
+  document.getElementById('studio-select').addEventListener('change', refreshEligibleSelect);
+
+  async function loadAllUsers() {
+    try {
+      var res = await fetch(API + '/api/users/public');
+      if (res.ok) {
+        var data = await res.json();
+        allUsers = data.users || [];
+      }
+    } catch (e) {}
+    refreshEligibleSelect();
+  }
+
+  function refreshEligibleSelect() {
+    var studio = document.getElementById('studio-select').value;
+    var select = document.getElementById('candidate-input');
+    var note = document.getElementById('eligibility-note');
+
+    var eligible = allUsers.filter(function(u) {
+      if (u.status === 'pending') return false;
+      if (!u.eligible) return false;
+      if (studio && u.studio && u.studio !== studio) return false;
+      return true;
+    });
+
+    var ineligible = allUsers.filter(function(u) {
+      if (u.status === 'pending') return false;
+      if (studio && u.studio && u.studio !== studio) return false;
+      return !u.eligible;
+    });
+
+    select.innerHTML = eligible.length
+      ? '<option value="">— select eligible learner —</option>' +
+        eligible.map(function(u) {
+          return '<option value="' + esc(u.name) + '">' + esc(u.name) +
+            (u.studio ? ' (' + esc(u.studio) + ')' : '') + '</option>';
+        }).join('')
+      : '<option value="">No eligible learners found</option>';
+
+    if (ineligible.length > 0) {
+      note.textContent = ineligible.length + ' learner(s) excluded due to strikes: ' +
+        ineligible.map(function(u) { return u.name; }).join(', ');
+      note.style.display = 'block';
+    } else {
+      note.style.display = 'none';
+    }
+  }
+
+  window.addCandidate = function() {
+    var select = document.getElementById('candidate-input');
+    var name = select.value.trim();
+    if (!name) return;
+    if (candidates.indexOf(name) !== -1) { alert('Candidate already added.'); return; }
+    candidates.push(name);
+    select.value = '';
+    renderCandidates();
+  };
+
+  window.removeCandidate = function(idx) {
+    candidates.splice(idx, 1);
+    renderCandidates();
+  };
+
+  function renderCandidates() {
+    var list = document.getElementById('candidate-list');
+    list.innerHTML = candidates.map(function(c, i) {
+      return '<li>' + esc(c) + '<button onclick="removeCandidate(' + i + ')" title="Remove">&times;</button></li>';
+    }).join('');
+    document.getElementById('start-btn').disabled = candidates.length < 2;
+  }
+
+  async function openVoting() {
+    var position = posSelect.value === 'custom' ? posCustom.value.trim() : posSelect.value;
+    if (!position) { alert('Enter a position name.'); return; }
+    if (candidates.length < 2) { alert('Add at least 2 candidates.'); return; }
+
+    var studio = document.getElementById('studio-select').value || null;
+
+    // Include position as first candidate label (store in candidates list with position prefix)
+    var payload = { candidates: candidates, studio: studio, position: position };
+
+    try {
+      var res = await fetch(API + '/api/election/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) { var d = await res.json(); alert(d.error || 'Setup failed'); return; }
+
+      var res2 = await fetch(API + '/api/election/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }
+      });
+      if (!res2.ok) { var d2 = await res2.json(); alert(d2.error || 'Failed to open voting'); return; }
+
+      // Store position label in sessionStorage for results display
+      sessionStorage.setItem('electionPosition', position);
+
+      setPhase('voting');
+      document.getElementById('voteUrl').textContent = window.location.origin + '/vote.html';
+      document.getElementById('liveCount').textContent = '0';
+      startPolling();
+    } catch (e) {
+      alert('Server error');
+    }
+  }
+  window.openVoting = openVoting;
+
+  // ================================================================
+  // Live poll during voting
+  // ================================================================
+  function startPolling() {
+    stopPolling();
+    pollInterval = setInterval(async function() {
+      try {
+        var res = await fetch(API + '/api/election/results', { headers: { 'x-admin-token': adminToken } });
+        if (res.ok) {
+          var data = await res.json();
+          document.getElementById('liveCount').textContent = data.voteCount;
+          if (data.phase === 'results') {
+            stopPolling();
+            setPhase('results');
+            showResults(data);
+          }
+        }
+      } catch (e) {}
+    }, 5000);
+  }
+
+  function stopPolling() {
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  }
+
+  // ================================================================
+  // Close polls
+  // ================================================================
+  async function closePolls() {
+    if (!confirm('Close the polls and reveal results?')) return;
+    try {
+      var res = await fetch(API + '/api/election/close', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }
+      });
+      if (!res.ok) { var d = await res.json(); alert(d.error || 'Failed'); return; }
+      stopPolling();
+
+      // Fetch final results
+      var res2 = await fetch(API + '/api/election/results', { headers: { 'x-admin-token': adminToken } });
+      var data = await res2.json();
+      currentElection = data;
+      setPhase('results');
+      showResults(data);
+    } catch (e) {
+      alert('Server error');
+    }
+  }
+  window.closePolls = closePolls;
+
+  // ================================================================
+  // Results
+  // ================================================================
+  function showResults(data) {
+    var chart = document.getElementById('results-chart');
+    var winnerArea = document.getElementById('winner-area');
+    var position = sessionStorage.getItem('electionPosition') || 'Leadership Position';
+    var studioLabel = data.studio ? data.studio : 'All Studios';
+    document.getElementById('results-position-label').textContent = position + ' \u2014 ' + studioLabel;
+
+    var tally = data.tally || {};
+    var sorted = (data.candidates || []).slice().sort(function(a, b) {
+      return (tally[b] || 0) - (tally[a] || 0);
+    });
+    var totalVotes = data.voteCount || 0;
+    var maxVotes = sorted.length > 0 ? (tally[sorted[0]] || 0) : 0;
+
+    chart.innerHTML = sorted.map(function(c, i) {
+      var count = tally[c] || 0;
+      var pct = maxVotes > 0 ? Math.round((count / maxVotes) * 100) : 0;
+      return '<div class="chart-bar-row">' +
+        '<div class="chart-name">' + esc(c) + '</div>' +
+        '<div class="chart-bar-track">' +
+          '<div class="chart-bar-fill bar-' + ((i % 6) + 1) + '" id="bar-' + i + '" data-pct="' + pct + '">' +
+            '<span style="opacity:0" id="bar-label-' + i + '">' + count + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('results-stats').innerHTML =
+      '<div class="results-stat"><div class="stat-val">' + totalVotes + '</div><div class="stat-lbl">Total Votes</div></div>' +
+      '<div class="results-stat"><div class="stat-val">' + sorted.length + '</div><div class="stat-lbl">Candidates</div></div>';
+
+    sorted.forEach(function(c, i) {
+      setTimeout(function() {
+        var bar = document.getElementById('bar-' + i);
+        var label = document.getElementById('bar-label-' + i);
+        if (!bar) return;
+        var pct = parseInt(bar.getAttribute('data-pct'));
+        bar.style.width = Math.max(pct, 8) + '%';
+        setTimeout(function() { if (label) label.style.opacity = '1'; }, 400);
+      }, 300 + i * 500);
+    });
+
+    var revealDelay = 300 + sorted.length * 500 + 600;
+    setTimeout(function() {
+      var topVotes = tally[sorted[0]] || 0;
+      var winners = sorted.filter(function(c) { return (tally[c] || 0) === topVotes; });
+
+      if (winners.length > 1 || topVotes === 0) {
+        winnerArea.innerHTML =
+          '<div class="tie-banner">' +
+            '<div class="tie-icon">&#9878;</div>' +
+            '<h3>' + (topVotes === 0 ? 'No Votes Cast' : 'It\'s a Tie!') + '</h3>' +
+            '<p>' + (topVotes === 0 ? 'No votes were recorded.' : winners.map(esc).join(' and ') + ' are tied with ' + topVotes + ' vote(s) each.') + '</p>' +
+          '</div>';
+      } else {
+        winnerArea.innerHTML =
+          '<div class="winner-banner" id="winner-banner">' +
+            '<div class="crown">&#128081;</div>' +
+            '<div class="winner-name">' + esc(sorted[0]) + '</div>' +
+            '<div class="winner-label">Elected ' + esc(position) + '</div>' +
+          '</div>';
+        setTimeout(function() {
+          var wb = document.getElementById('winner-banner');
+          if (wb) wb.classList.add('show');
+          fireConfetti();
+        }, 100);
+      }
+    }, revealDelay);
+  }
+
+  // ================================================================
+  // Reset
+  // ================================================================
+  async function resetElection() {
+    if (!confirm('Archive this election and start a new one?')) return;
+    try {
+      var res = await fetch(API + '/api/election/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }
+      });
+      if (res.ok) {
+        candidates = [];
+        sessionStorage.removeItem('electionPosition');
+        renderCandidates();
+        setPhase('setup');
+        loadElectionState(); // refresh history
+        loadAllUsers();      // refresh eligible learners
+      }
+    } catch (e) {
+      alert('Server error');
+    }
+  }
+  window.resetElection = resetElection;
+
+  // ================================================================
+  // History
+  // ================================================================
+  function renderHistory(history) {
+    var container = document.getElementById('history-list');
+    if (!history || history.length === 0) {
+      container.innerHTML = '<div class="no-history">No elections yet. Run your first election above!</div>';
+      return;
+    }
+    container.innerHTML = history.map(function(h) {
+      var d = new Date(h.date);
+      var dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      var tally = h.tally || {};
+      var sorted = Object.keys(tally).sort(function(a, b) { return tally[b] - tally[a]; });
+      var winner = sorted[0];
+      var topVotes = tally[winner] || 0;
+      var tied = sorted.filter(function(c) { return tally[c] === topVotes; }).length > 1;
+      var votesSummary = sorted.map(function(c) { return c + ': ' + tally[c]; }).join(', ');
+      var trophy = tied ? '&#9878;' : '&#127942;';
+
+      return '<div class="history-entry">' +
+        '<div class="history-trophy">' + trophy + '</div>' +
+        '<div class="history-details">' +
+          '<strong>' + esc(h.studio || 'All Studios') + '</strong> &mdash; ' +
+          (tied ? '<em>Tied</em>' : 'Winner: <strong>' + esc(winner) + '</strong>') +
+          '<div class="history-votes">' + votesSummary + ' &bull; ' + h.voteCount + ' voter(s)</div>' +
+        '</div>' +
+        '<div class="history-date">' + dateStr + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ================================================================
+  // Phase management
+  // ================================================================
+  function setPhase(phase) {
+    var phases = ['setup', 'voting', 'results'];
+    phases.forEach(function(p) {
+      document.getElementById('phase-' + p).classList.toggle('active', p === phase);
+      var pi = document.getElementById('pi-' + p);
+      var idx = phases.indexOf(p);
+      var currentIdx = phases.indexOf(phase);
+      pi.classList.remove('active', 'done');
+      if (idx === currentIdx) pi.classList.add('active');
+      else if (idx < currentIdx) pi.classList.add('done');
+    });
+  }
+
+  // ================================================================
+  // Confetti
+  // ================================================================
+  function fireConfetti() {
+    var canvas = document.getElementById('confetti-canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var pieces = [];
+    var colors = ['#2563eb', '#7c3aed', '#ea580c', '#16a34a', '#dc2626', '#d97706', '#0c284f', '#f59e0b'];
+    for (var i = 0; i < 150; i++) {
+      pieces.push({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 18,
+        vy: -Math.random() * 18 - 4,
+        w: Math.random() * 10 + 5,
+        h: Math.random() * 6 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 12,
+        gravity: 0.35 + Math.random() * 0.15,
+        life: 1
+      });
+    }
+    var frame = 0;
+    function animate() {
+      frame++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      var alive = false;
+      pieces.forEach(function(p) {
+        if (p.life <= 0) return;
+        alive = true;
+        p.x += p.vx;
+        p.vy += p.gravity;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vx *= 0.99;
+        if (frame > 60) p.life -= 0.015;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive && frame < 200) requestAnimationFrame(animate);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    animate();
+  }
+
+  // ================================================================
+  // Utility
+  // ================================================================
+  function esc(text) {
+    var div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  }
+
+  // ================================================================
+  // Init
+  // ================================================================
+  renderCandidates();
+  checkAdminToken();
+})();
+</script>
+</body>
+</html>

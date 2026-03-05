@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Admin - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ---- Admin panel styles ---- */
+  .login-screen {
+    max-width: 400px;
+    margin: 80px auto;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+
+  .login-screen .lock-icon { font-size: 2.8rem; margin-bottom: 12px; }
+  .login-screen h2 { color: var(--accent); margin-bottom: 4px; font-size: 1.4rem; }
+  .login-screen p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px; }
+
+  .login-field {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-field:focus { border-color: var(--accent); }
+
+  .login-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    display: none;
+  }
+
+  /* ---- Dashboard ---- */
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--surface2);
+  }
+
+  .admin-header h1 { margin: 0; font-size: 1.5rem; }
+
+  .admin-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-tile {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--surface2);
+    text-align: center;
+  }
+
+  .stat-tile .st-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1; }
+  .stat-tile .st-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; font-weight: 600; }
+  .stat-tile.t-es .st-num { color: var(--blue); }
+  .stat-tile.t-ms .st-num { color: var(--purple); }
+  .stat-tile.t-pos .st-num { color: var(--green); }
+
+  /* ---- Invite section ---- */
+  .invite-section {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid var(--surface2);
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .invite-section h3 { margin: 0 0 16px; color: var(--accent); font-size: 1rem; }
+  .invite-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+  .invite-row .form-group { flex: 1; min-width: 150px; }
+  .pending-inv-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 12px; }
+  .pending-inv-table th { background: var(--bg); padding: 8px 12px; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--surface2); }
+  .pending-inv-table td { padding: 9px 12px; border-bottom: 1px solid var(--surface2); vertical-align: middle; background: var(--surface); }
+  .pending-inv-table tr:last-child td { border-bottom: none; }
+  .inv-used { color: var(--green); font-weight: 600; }
+  .inv-pending { color: var(--text-muted); }
+  .inv-expired { color: var(--red); }
+
+  /* ---- Add user form ---- */
+  .add-user-form {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid var(--surface2);
+    margin-bottom: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .add-user-form h3 { margin: 0 0 16px; color: var(--accent); font-size: 1rem; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .form-input, .form-select {
+    padding: 9px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+  /* ---- User table ---- */
+  .table-section {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--surface2);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    margin-bottom: 28px;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--surface2);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .table-header h3 { margin: 0; font-size: 0.95rem; color: var(--accent); }
+
+  .table-search {
+    padding: 7px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.82rem;
+    outline: none;
+    width: 180px;
+    transition: border-color 0.2s;
+  }
+  .table-search:focus { border-color: var(--accent); }
+
+  .user-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .user-table th { background: var(--bg); padding: 10px 16px; text-align: left; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--surface2); }
+  .user-table td { padding: 11px 16px; border-bottom: 1px solid var(--surface2); vertical-align: middle; background: var(--surface); }
+  .user-table tr:last-child td { border-bottom: none; }
+  .user-table tr:hover td { background: var(--bg); }
+
+  .studio-tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .studio-tag.ES { background: #dbeafe; color: #1d4ed8; }
+  .studio-tag.MS { background: #ede9fe; color: #6d28d9; }
+  .studio-tag.none { background: var(--surface2); color: var(--text-muted); }
+
+  .elig-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  .elig-dot.yes { background: var(--green); }
+  .elig-dot.no { background: var(--red); }
+
+  .marks-cell { color: var(--text-muted); font-size: 0.78rem; }
+
+  .action-btns { display: flex; gap: 6px; }
+
+  .btn-sm {
+    padding: 5px 11px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  .btn-sm:hover { opacity: 0.8; }
+  .btn-edit { background: #dbeafe; color: #1d4ed8; }
+  .btn-delete { background: #fee2e2; color: #991b1b; }
+  .btn-setpw { background: #d1fae5; color: #065f46; }
+
+  /* ---- Edit modal ---- */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-box {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 28px;
+    width: 90%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .modal-box h3 { margin: 0 0 20px; color: var(--accent); }
+
+  .marks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .mark-input-group { display: flex; flex-direction: column; gap: 5px; }
+  .mark-input-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mark-num-input {
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    width: 100%;
+  }
+  .mark-num-input:focus { border-color: var(--accent); }
+
+  .elig-preview {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+  .elig-preview.eligible { background: #dcfce7; color: #166534; border-color: var(--green); }
+  .elig-preview.ineligible { background: #fee2e2; color: #991b1b; border-color: var(--red); }
+
+  /* ---- Activity log ---- */
+  .activity-section {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--surface2);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .activity-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .activity-header h3 { margin: 0; font-size: 0.95rem; color: var(--accent); }
+
+  .activity-list { max-height: 280px; overflow-y: auto; }
+
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--surface2);
+    align-items: flex-start;
+    font-size: 0.83rem;
+  }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-action {
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    min-width: 100px;
+  }
+
+  .activity-detail { color: var(--text); flex: 1; }
+  .activity-time { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+
+  /* ---- Password change ---- */
+  .settings-section {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--surface2);
+    padding: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .settings-section h3 { margin: 0 0 14px; color: var(--accent); font-size: 0.95rem; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 300;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: var(--red); }
+
+  .section-divider {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--surface2);
+  }
+
+  .multi-pos-picker {
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .multi-pos-picker .pos-group-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 6px 0 2px;
+  }
+  .multi-pos-picker .pos-group-label:first-child { margin-top: 0; }
+  .multi-pos-picker label.pos-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+  .multi-pos-picker label.pos-option:hover { background: var(--surface2); }
+  .multi-pos-picker label.pos-option input { accent-color: var(--primary); }
+  .pos-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .pos-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+  .pos-tag .pos-tag-x {
+    cursor: pointer;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .pos-tag .pos-tag-x:hover { opacity: 1; }
+
+  @media (max-width: 700px) {
+    .marks-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .user-table { font-size: 0.78rem; }
+    .user-table th:nth-child(4),
+    .user-table td:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="main-content">
+  <div class="breadcrumbs">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="roster.html">Member Roster</a>
+    <span class="sep">/</span>
+    <span>Admin Panel</span>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div class="login-screen">
+      <div class="lock-icon">🔐</div>
+      <h2>Admin Panel</h2>
+      <p>Enter the admin password to manage the member roster.</p>
+      <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+      <input class="login-field" type="password" id="passwordInput" placeholder="Admin password"
+             onkeydown="if(event.key==='Enter') doLogin()">
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+      <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted);">
+        <a href="roster.html" style="color:var(--blue);">← Back to Roster</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD (hidden until logged in) -->
+  <div id="adminDash" style="display:none">
+
+    <div class="admin-header">
+      <h1>User Admin <span class="badge badge-shared">Admin</span></h1>
+      <div class="admin-actions">
+        <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+        <a href="roster.html" class="btn btn-secondary" style="text-decoration:none">View Roster</a>
+        <button class="btn btn-secondary" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="adminStats">
+      <div class="stat-tile"><div class="st-num" id="as-total">—</div><div class="st-label">Total</div></div>
+      <div class="stat-tile t-es"><div class="st-num" id="as-es">—</div><div class="st-label">ES</div></div>
+      <div class="stat-tile t-ms"><div class="st-num" id="as-ms">—</div><div class="st-label">MS</div></div>
+      <div class="stat-tile t-pos"><div class="st-num" id="as-pos">—</div><div class="st-label">Position Holders</div></div>
+      <div class="stat-tile"><div class="st-num" id="as-nostudio">—</div><div class="st-label">No Studio</div></div>
+    </div>
+
+    <!-- Invite section -->
+    <div class="invite-section">
+      <h3>✉️ Invite Member by Email</h3>
+      <div class="invite-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input class="form-input" id="inviteName" placeholder="e.g. Jane Smith" type="text">
+        </div>
+        <div class="form-group">
+          <label>Email * (@triumphactonacademy.com)</label>
+          <input class="form-input" id="inviteEmail" placeholder="jane@triumphactonacademy.com" type="email">
+        </div>
+        <div class="form-group">
+          <label>Studio</label>
+          <select class="form-select" id="inviteStudio">
+            <option value="">Not set</option>
+            <option value="ES">Elementary Studio (ES)</option>
+            <option value="MS">Middle School (MS)</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="sendInvite()" id="inviteBtn">Send Invite</button>
+        </div>
+      </div>
+      <!-- Pending invitations -->
+      <div id="inviteListWrap" style="display:none;">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Sent Invitations</div>
+        <div style="overflow-x:auto;">
+          <table class="pending-inv-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Studio</th><th>Sent</th><th>Status</th></tr></thead>
+            <tbody id="inviteTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add user form -->
+    <div class="add-user-form">
+      <h3>➕ Add New Member (No Email)</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input class="form-input" id="newName" placeholder="e.g. Jane Smith" type="text">
+        </div>
+        <div class="form-group">
+          <label>Studio</label>
+          <select class="form-select" id="newStudio">
+            <option value="">Not set</option>
+            <option value="ES">Elementary Studio (ES)</option>
+            <option value="MS">Middle School (MS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Positions</label>
+          <div class="multi-pos-picker" id="newPositionPicker"></div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input class="form-input" id="newNotes" placeholder="Optional notes" type="text">
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn btn-primary" onclick="addUser()">Add Member</button>
+      </div>
+    </div>
+
+    <!-- User table -->
+    <div class="table-section">
+      <div class="table-header">
+        <h3>All Members</h3>
+        <input class="table-search" type="text" id="tableSearch" placeholder="Search…" oninput="renderTable()">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Studio</th>
+              <th>Position</th>
+              <th>Marks / Strikes</th>
+              <th>Eligibility</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Activity log -->
+    <div class="section-divider">Recent Activity</div>
+    <div class="activity-section" style="margin-bottom:28px;">
+      <div class="activity-header">
+        <h3>Activity Log</h3>
+        <button class="btn btn-secondary" style="font-size:0.78rem;padding:5px 12px;" onclick="loadActivity()">Refresh</button>
+      </div>
+      <div class="activity-list" id="activityList">
+        <div style="padding:24px; text-align:center; color:var(--text-muted); font-size:0.85rem;">No activity yet.</div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section-divider">Settings</div>
+    <div class="settings-section">
+      <h3>Change Admin Password</h3>
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div class="form-group" style="flex:1; min-width:160px;">
+          <label>New Password (min 6 chars)</label>
+          <input class="form-input" type="password" id="newPwInput" placeholder="New password">
+        </div>
+        <div class="form-group" style="flex:1; min-width:160px;">
+          <label>Confirm Password</label>
+          <input class="form-input" type="password" id="confirmPwInput" placeholder="Confirm password">
+        </div>
+        <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px; margin-bottom:0;">
+        Changing the password will sign you out.
+      </p>
+    </div>
+
+  </div><!-- end adminDash -->
+</main>
+
+<!-- Edit user modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal-box">
+    <h3>Edit Member</h3>
+    <input type="hidden" id="editId">
+
+    <div class="form-grid" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input class="form-input" id="editName" type="text">
+      </div>
+      <div class="form-group">
+        <label>Studio</label>
+        <select class="form-select" id="editStudio">
+          <option value="">Not set</option>
+          <option value="ES">Elementary Studio (ES)</option>
+          <option value="MS">Middle School (MS)</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>Positions</label>
+        <div class="multi-pos-picker" id="editPositionPicker"></div>
+      </div>
+    </div>
+
+    <div class="section-divider" style="margin-top:0;">Marks &amp; Strikes</div>
+
+    <div class="marks-grid">
+      <div class="mark-input-group">
+        <label style="color:var(--blue);">🔵 Blue Marks</label>
+        <input class="mark-num-input" type="number" id="editBlue" min="0" max="99" oninput="updateEligPreview()">
+      </div>
+      <div class="mark-input-group">
+        <label style="color:var(--red);">🔴 Red Marks</label>
+        <input class="mark-num-input" type="number" id="editRed" min="0" max="99" oninput="updateEligPreview()">
+      </div>
+      <div class="mark-input-group">
+        <label style="color:#6b7280;">⚫ Black Marks</label>
+        <input class="mark-num-input" type="number" id="editBlack" min="0" max="99" oninput="updateEligPreview()">
+      </div>
+      <div class="mark-input-group">
+        <label>⚡ Strikes</label>
+        <input class="mark-num-input" type="number" id="editStrikes" min="0" max="99" oninput="updateEligPreview()">
+      </div>
+      <div class="mark-input-group">
+        <label>Status</label>
+        <select class="form-select" id="editStatus" style="padding:8px 10px;">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="elig-preview" id="eligPreview">Loading…</div>
+
+    <div class="form-group" style="margin-bottom:18px;">
+      <label>Notes</label>
+      <input class="form-input" type="text" id="editNotes" placeholder="Optional notes">
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal-box" style="max-width:380px; text-align:center;">
+    <div style="font-size:2.2rem; margin-bottom:10px;">🗑️</div>
+    <h3 style="margin-bottom:6px;">Remove Member?</h3>
+    <p id="deleteModalName" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:22px;">
+      This will permanently remove this member from the roster.
+    </p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn" style="background:var(--red);color:#fff;" onclick="confirmDelete()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite link modal -->
+<div class="modal-backdrop" id="linkModal">
+  <div class="modal-box" style="max-width:480px; text-align:center;">
+    <div style="font-size:2rem; margin-bottom:10px;">📧</div>
+    <h3 style="margin-bottom:6px;">Email Not Configured</h3>
+    <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:18px;">
+      The invitation for <strong id="linkModalName"></strong> was created, but the email couldn't be sent.
+      Share this link with them directly:
+    </p>
+    <input id="linkModalUrl" type="text" readonly
+      style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--surface2);background:var(--bg);color:var(--accent);font-size:0.82rem;font-weight:600;margin-bottom:14px;box-sizing:border-box;cursor:text;"
+      onclick="this.select()">
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn btn-secondary" onclick="document.getElementById('linkModal').classList.remove('open')">Close</button>
+      <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('linkModalUrl').value).then(()=>showToast('Copied!'))">Copy Link</button>
+    </div>
+    <p style="margin-top:14px; font-size:0.75rem; color:var(--text-muted);">
+      Set <code>GMAIL_USER</code> and <code>GMAIL_APP_PASSWORD</code> in Railway to enable automatic email sending.
+    </p>
+  </div>
+</div>
+
+<!-- Set Password modal -->
+<div class="modal-backdrop" id="setPwModal">
+  <div class="modal-box" style="max-width:400px;">
+    <h3>Set Password</h3>
+    <p id="setPwModalName" style="color:var(--text-muted);font-size:0.88rem;margin-bottom:20px;"></p>
+    <input type="hidden" id="setPwId">
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>New Password (min 8 chars)</label>
+      <input class="form-input" type="password" id="setPwInput" placeholder="At least 8 characters"
+             onkeydown="if(event.key==='Enter') confirmSetPw()">
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label>Confirm Password</label>
+      <input class="form-input" type="password" id="setPwConfirm" placeholder="Repeat password"
+             onkeydown="if(event.key==='Enter') confirmSetPw()">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeSetPwModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmSetPw()" id="setPwBtn">Set Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="nav.js"></script>
+<script>
+  const API = window.location.origin;
+  let adminToken = localStorage.getItem('adminToken') || null;
+  let allUsers = [];
+  let deleteTargetId = null;
+
+  const ALL_POSITIONS = {
+    'Town Hall Staff': [
+      'Tribe Town Hall Leader','Backup Tribe Town Hall Leader','Tribe Town Hall Leader Assistant',
+      'Tribe Town Hall Secretary','Backup Tribe Town Hall Secretary',
+      'MS Town Hall Leader','MS Town Hall Secretary','ES Town Hall Leader','ES Town Hall Secretary'
+    ],
+    'Strike Staff': [
+      'ES Strike Champion','ES Strike Champion 1st Backup','ES Strike Champion 2nd Backup',
+      'MS Strike Champion','MS Strike Champion 1st Backup','MS Strike Champion 2nd Backup'
+    ],
+    'Studio Champions': [
+      'MS Studio Champion','MS Studio Champion Backup','ES Studio Champion','ES Studio Champion Backup'
+    ],
+    'Expo Staff': [
+      'MS Expo Manager','ES Expo Manager','WG Expo Manager','Expo MC'
+    ]
+  };
+
+  function buildPositionPicker(containerId, selected) {
+    selected = selected || [];
+    const container = document.getElementById(containerId);
+    let html = '';
+    for (const [group, items] of Object.entries(ALL_POSITIONS)) {
+      html += `<div class="pos-group-label">${escHtml(group)}</div>`;
+      for (const pos of items) {
+        const checked = selected.includes(pos) ? 'checked' : '';
+        html += `<label class="pos-option"><input type="checkbox" value="${escHtml(pos)}" ${checked}> ${escHtml(pos)}</label>`;
+      }
+    }
+    container.innerHTML = html;
+  }
+
+  function getPickerPositions(containerId) {
+    const container = document.getElementById(containerId);
+    return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  }
+
+  // ---- Auth ----
+  async function doLogin() {
+    const pw = document.getElementById('passwordInput').value;
+    document.getElementById('loginError').style.display = 'none';
+    try {
+      const res = await fetch(`${API}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        adminToken = data.token;
+        localStorage.setItem('adminToken', adminToken);
+        showDash();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    } catch (e) {
+      document.getElementById('loginError').textContent = 'Server unreachable. Is it running?';
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  async function doLogout() {
+    // Sign out via the unified learner endpoint (clears admin session on server)
+    const learnerToken = localStorage.getItem('learnerToken');
+    if (learnerToken) {
+      await fetch(`${API}/api/learner/logout`, {
+        method: 'POST',
+        headers: { 'x-learner-token': learnerToken }
+      }).catch(() => {});
+    }
+    // Clear all session keys
+    ['learnerToken', 'adminToken',
+     'userName', 'userStudio', 'userRole', 'userPositions', 'userPosition',
+     'learnerName', 'learnerStudio'
+    ].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'learner-login.html';
+  }
+
+  function showDash() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    buildPositionPicker('newPositionPicker', []);
+    buildPositionPicker('editPositionPicker', []);
+    loadAll();
+  }
+
+  async function checkToken() {
+    if (!adminToken) return;
+    // Quick check: try a protected endpoint
+    try {
+      const res = await fetch(`${API}/api/activity`, {
+        headers: { 'x-admin-token': adminToken }
+      });
+      if (res.ok) showDash();
+      else { adminToken = null; localStorage.removeItem('adminToken'); }
+    } catch (e) { /* server might be off, stay on login */ }
+  }
+
+  // ---- Load data ----
+  async function loadAll() {
+    await Promise.all([loadUsers(), loadStats(), loadActivity(), loadInvitations()]);
+  }
+
+  async function loadUsers() {
+    const res = await fetch(`${API}/api/users`, { headers: { 'x-admin-token': adminToken } });
+    const data = await res.json();
+    allUsers = data.users || [];
+    renderTable();
+  }
+
+  async function loadStats() {
+    const res = await fetch(`${API}/api/users/stats`);
+    const s = await res.json();
+    document.getElementById('as-total').textContent = s.total;
+    document.getElementById('as-es').textContent = s.es;
+    document.getElementById('as-ms').textContent = s.ms;
+    document.getElementById('as-pos').textContent = s.withPosition;
+    document.getElementById('as-nostudio').textContent = s.noStudio;
+  }
+
+  async function loadActivity() {
+    const res = await fetch(`${API}/api/activity`, {
+      headers: { 'x-admin-token': adminToken }
+    });
+    const data = await res.json();
+    const list = document.getElementById('activityList');
+    if (!data.log || data.log.length === 0) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No activity yet.</div>';
+      return;
+    }
+    list.innerHTML = data.log.map(item => {
+      const d = new Date(item.date);
+      const time = d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      return `<div class="activity-item">
+        <span class="activity-action">${escHtml(item.action)}</span>
+        <span class="activity-detail">${escHtml(item.detail)}</span>
+        <span class="activity-time">${time}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ---- Table render ----
+  function renderTable() {
+    const q = document.getElementById('tableSearch').value.toLowerCase();
+    const users = allUsers.filter(u => !q || u.name.toLowerCase().includes(q));
+    const tbody = document.getElementById('userTableBody');
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">No members yet. Add one above.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+      const studioTag = u.studio
+        ? `<span class="studio-tag ${u.studio}">${u.studio}</span>`
+        : `<span class="studio-tag none">—</span>`;
+
+      const marksCell = u.marks
+        ? `<span class="marks-cell">`
+          + (u.marks.blue > 0 ? `<span style="color:var(--blue)">●${u.marks.blue}</span> ` : '')
+          + (u.marks.red > 0 ? `<span style="color:var(--red)">●${u.marks.red}</span> ` : '')
+          + (u.marks.black > 0 ? `<span style="color:#6b7280">●${u.marks.black}</span> ` : '')
+          + (u.strikes > 0 ? `<span>⚡${u.strikes}</span>` : '')
+          + `</span>`
+        : '—';
+
+      const eligCell = `<span class="elig-dot ${u.eligible ? 'yes' : 'no'}"></span>${u.eligible ? 'Eligible' : 'Ineligible'}`;
+      const joined = u.joinDate ? new Date(u.joinDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—';
+
+      return `<tr>
+        <td style="font-weight:600;">${escHtml(u.name)}</td>
+        <td>${studioTag}</td>
+        <td style="font-size:0.8rem;color:var(--text-muted);">${u.positions && u.positions.length > 0 ? u.positions.map(p => escHtml(p)).join(', ') : '<span style="color:var(--surface2)">—</span>'}</td>
+        <td>${marksCell}</td>
+        <td style="font-size:0.82rem;">${eligCell}</td>
+        <td style="font-size:0.78rem;color:var(--text-muted);">${joined}</td>
+        <td><div class="action-btns">
+          <button class="btn-sm btn-edit" onclick="openEdit('${u.id}')">Edit</button>
+          <button class="btn-sm btn-setpw" onclick="openSetPw('${u.id}','${escAttr(u.name)}')">Set PW</button>
+          <button class="btn-sm btn-delete" onclick="openDelete('${u.id}','${escAttr(u.name)}')">Remove</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ---- Invitations ----
+  async function loadInvitations() {
+    try {
+      const res = await fetch(`${API}/api/invitations`, { headers: { 'x-admin-token': adminToken } });
+      if (!res.ok) return;
+      const data = await res.json();
+      const invs = data.invitations || [];
+      const wrap = document.getElementById('inviteListWrap');
+      const tbody = document.getElementById('inviteTableBody');
+      if (invs.length === 0) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      tbody.innerHTML = invs.map(inv => {
+        const user = allUsers.find(u => u.id === inv.userId);
+        const name = user ? escHtml(user.name) : '—';
+        const studio = user && user.studio ? user.studio : '—';
+        const sent = new Date(inv.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+        const now = new Date();
+        const expired = !inv.used && new Date(inv.expiresAt) < now;
+        const statusHtml = inv.used
+          ? '<span class="inv-used">✓ Accepted</span>'
+          : expired
+          ? '<span class="inv-expired">Expired</span>'
+          : '<span class="inv-pending">Pending</span>';
+        const link = `${window.location.origin}/invite.html?token=${inv.token}`;
+        const copyBtn = (!inv.used && !expired)
+          ? `<button class="btn-sm btn-edit" onclick="copyInviteLink('${link}')" title="Copy invite link">Copy Link</button>`
+          : '';
+        return `<tr>
+          <td style="font-weight:600;">${name}</td>
+          <td style="color:var(--text-muted)">${escHtml(inv.email)}</td>
+          <td>${studio}</td>
+          <td style="color:var(--text-muted)">${sent}</td>
+          <td>${statusHtml} ${copyBtn}</td>
+        </tr>`;
+      }).join('');
+    } catch (e) { /* ignore */ }
+  }
+
+  async function sendInvite() {
+    const name = document.getElementById('inviteName').value.trim();
+    const email = document.getElementById('inviteEmail').value.trim();
+    const studio = document.getElementById('inviteStudio').value;
+
+    if (!name) { showToast('Name is required', true); return; }
+    if (!email) { showToast('Email is required', true); return; }
+    if (!email.toLowerCase().endsWith('@triumphactonacademy.com')) {
+      showToast('Email must end with @triumphactonacademy.com', true); return;
+    }
+
+    document.getElementById('inviteBtn').disabled = true;
+    document.getElementById('inviteBtn').textContent = 'Sending…';
+
+    try {
+      const res = await fetch(`${API}/api/invitations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ name, email, studio: studio || null })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('inviteName').value = '';
+        document.getElementById('inviteEmail').value = '';
+        document.getElementById('inviteStudio').value = '';
+        await loadAll();
+        if (data.emailFailed) {
+          showLinkModal(data.inviteLink, name);
+        } else {
+          showToast(`Invitation email sent to ${email}`);
+        }
+      } else {
+        showToast(data.error || 'Failed to send invitation', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+    document.getElementById('inviteBtn').disabled = false;
+    document.getElementById('inviteBtn').textContent = 'Send Invite';
+  }
+
+  function copyInviteLink(link) {
+    navigator.clipboard.writeText(link).then(() => showToast('Link copied to clipboard')).catch(() => {
+      prompt('Copy this invite link:', link);
+    });
+  }
+
+  function showLinkModal(link, name) {
+    document.getElementById('linkModalName').textContent = name;
+    document.getElementById('linkModalUrl').value = link;
+    document.getElementById('linkModal').classList.add('open');
+  }
+
+  // ---- Add user ----
+  async function addUser() {
+    const name = document.getElementById('newName').value.trim();
+    if (!name) { showToast('Name is required', true); return; }
+    const payload = {
+      name,
+      studio: document.getElementById('newStudio').value || null,
+      positions: getPickerPositions('newPositionPicker'),
+      notes: document.getElementById('newNotes').value.trim()
+    };
+    try {
+      const res = await fetch(`${API}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        document.getElementById('newName').value = '';
+        document.getElementById('newStudio').value = '';
+        buildPositionPicker('newPositionPicker', []);
+        document.getElementById('newNotes').value = '';
+        showToast(`${name} added to roster`);
+        await loadAll();
+      } else {
+        const d = await res.json();
+        showToast(d.error || 'Failed to add member', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+  }
+
+  // ---- Edit modal ----
+  function openEdit(id) {
+    const u = allUsers.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById('editId').value = u.id;
+    document.getElementById('editName').value = u.name;
+    document.getElementById('editStudio').value = u.studio || '';
+    buildPositionPicker('editPositionPicker', u.positions || []);
+    document.getElementById('editBlue').value = u.marks?.blue || 0;
+    document.getElementById('editRed').value = u.marks?.red || 0;
+    document.getElementById('editBlack').value = u.marks?.black || 0;
+    document.getElementById('editStrikes').value = u.strikes || 0;
+    document.getElementById('editNotes').value = u.notes || '';
+    document.getElementById('editStatus').value = u.status || 'active';
+    updateEligPreview();
+    document.getElementById('editModal').classList.add('open');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('open');
+  }
+
+  function updateEligPreview() {
+    const studio = document.getElementById('editStudio').value;
+    const blue = parseInt(document.getElementById('editBlue').value) || 0;
+    const red = parseInt(document.getElementById('editRed').value) || 0;
+    const black = parseInt(document.getElementById('editBlack').value) || 0;
+    const strikes = parseInt(document.getElementById('editStrikes').value) || 0;
+
+    let eligible = true;
+    let reason = '';
+
+    if (studio === 'ES') {
+      if (blue >= 10) { eligible = false; reason = `${blue} blue marks (threshold: 10)`; }
+      else if (red >= 10) { eligible = false; reason = `${red} red marks (threshold: 10)`; }
+    } else if (studio === 'MS') {
+      if (black >= 2) { eligible = false; reason = `${black} black marks (threshold: 2)`; }
+      else if (strikes >= 2) { eligible = false; reason = `${strikes} strikes (threshold: 2)`; }
+    }
+
+    const el = document.getElementById('eligPreview');
+    if (eligible) {
+      el.className = 'elig-preview eligible';
+      el.textContent = studio ? `✓ Eligible for leadership positions` : 'Set a studio to calculate eligibility';
+    } else {
+      el.className = 'elig-preview ineligible';
+      el.textContent = `✗ Ineligible — ${reason}`;
+    }
+  }
+
+  async function saveEdit() {
+    const id = document.getElementById('editId').value;
+    const payload = {
+      name: document.getElementById('editName').value.trim(),
+      studio: document.getElementById('editStudio').value || null,
+      positions: getPickerPositions('editPositionPicker'),
+      marks: {
+        blue: parseInt(document.getElementById('editBlue').value) || 0,
+        red: parseInt(document.getElementById('editRed').value) || 0,
+        black: parseInt(document.getElementById('editBlack').value) || 0
+      },
+      strikes: parseInt(document.getElementById('editStrikes').value) || 0,
+      notes: document.getElementById('editNotes').value.trim(),
+      status: document.getElementById('editStatus').value
+    };
+    if (!payload.name) { showToast('Name is required', true); return; }
+    try {
+      const res = await fetch(`${API}/api/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        closeEditModal();
+        showToast('Member updated');
+        await loadAll();
+      } else {
+        showToast('Failed to update', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+  }
+
+  // ---- Delete ----
+  function openDelete(id, name) {
+    deleteTargetId = id;
+    document.getElementById('deleteModalName').textContent = `Remove "${name}" from the roster? This cannot be undone.`;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+    deleteTargetId = null;
+  }
+
+  async function confirmDelete() {
+    if (!deleteTargetId) return;
+    try {
+      const res = await fetch(`${API}/api/users/${deleteTargetId}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': adminToken }
+      });
+      if (res.ok) {
+        closeDeleteModal();
+        showToast('Member removed');
+        await loadAll();
+      } else {
+        showToast('Failed to remove', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+  }
+
+  // ---- Set learner password ----
+  function openSetPw(id, name) {
+    document.getElementById('setPwId').value = id;
+    document.getElementById('setPwModalName').textContent = `Set a new login password for "${name}".`;
+    document.getElementById('setPwInput').value = '';
+    document.getElementById('setPwConfirm').value = '';
+    document.getElementById('setPwModal').classList.add('open');
+    setTimeout(() => document.getElementById('setPwInput').focus(), 100);
+  }
+
+  function closeSetPwModal() {
+    document.getElementById('setPwModal').classList.remove('open');
+  }
+
+  async function confirmSetPw() {
+    const id = document.getElementById('setPwId').value;
+    const pw = document.getElementById('setPwInput').value;
+    const pw2 = document.getElementById('setPwConfirm').value;
+    if (pw.length < 8) { showToast('Password must be at least 8 characters', true); return; }
+    if (pw !== pw2) { showToast('Passwords do not match', true); return; }
+    document.getElementById('setPwBtn').disabled = true;
+    document.getElementById('setPwBtn').textContent = 'Saving…';
+    try {
+      const res = await fetch(`${API}/api/admin/users/${id}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ password: pw })
+      });
+      if (res.ok) {
+        closeSetPwModal();
+        showToast('Password set successfully');
+      } else {
+        const d = await res.json();
+        showToast(d.error || 'Failed to set password', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+    document.getElementById('setPwBtn').disabled = false;
+    document.getElementById('setPwBtn').textContent = 'Set Password';
+  }
+
+  // ---- Change password ----
+  async function changePassword() {
+    const np = document.getElementById('newPwInput').value;
+    const cp = document.getElementById('confirmPwInput').value;
+    if (np !== cp) { showToast('Passwords do not match', true); return; }
+    if (np.length < 6) { showToast('Password must be at least 6 characters', true); return; }
+    try {
+      const res = await fetch(`${API}/api/admin/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ newPassword: np })
+      });
+      if (res.ok) {
+        showToast('Password updated. Signing out…');
+        setTimeout(() => doLogout(), 1500);
+      } else {
+        showToast('Failed to update password', true);
+      }
+    } catch (e) {
+      showToast('Server error', true);
+    }
+  }
+
+  // ---- CSV Export ----
+  function exportCSV() {
+    const headers = ['Name', 'Studio', 'Position', 'Blue Marks', 'Red Marks', 'Black Marks', 'Strikes', 'Eligible', 'Joined', 'Notes'];
+    const rows = allUsers.map(u => [
+      u.name, u.studio || '', (u.positions || []).join('; '),
+      u.marks?.blue || 0, u.marks?.red || 0, u.marks?.black || 0,
+      u.strikes || 0, u.eligible ? 'Yes' : 'No',
+      u.joinDate || '', u.notes || ''
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `triumph-roster-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  }
+
+  // ---- Toast ----
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ---- Helpers ----
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) {
+    return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  }
+
+  // Close modals on backdrop click
+  document.getElementById('editModal').addEventListener('click', function(e) { if (e.target===this) closeEditModal(); });
+  document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target===this) closeDeleteModal(); });
+  document.getElementById('linkModal').addEventListener('click', function(e) { if (e.target===this) this.classList.remove('open'); });
+  document.getElementById('setPwModal').addEventListener('click', function(e) { if (e.target===this) closeSetPwModal(); });
+
+  // On load: check if already logged in
+  checkToken();
+</script>
+</body>
+</html>

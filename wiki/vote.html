@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Election Booth - Triumph Academy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .vote-wrap {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+
+  .voter-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    border: 1px solid var(--surface2);
+    font-size: 0.88rem;
+  }
+  .voter-name { font-weight: 700; color: var(--accent); }
+  .voter-studio { color: var(--text-muted); }
+
+  .status-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 40px 32px;
+    text-align: center;
+    border: 1px solid var(--surface2);
+  }
+  .status-icon { font-size: 3rem; margin-bottom: 14px; }
+  .status-card h2 { margin: 0 0 8px; color: var(--accent); }
+  .status-card p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+
+  /* Ballot */
+  .ballot-card {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid var(--surface2);
+    overflow: hidden;
+  }
+  .ballot-header {
+    background: var(--accent);
+    color: #fff;
+    padding: 18px 24px;
+    text-align: center;
+  }
+  .ballot-header h2 { margin: 0; font-size: 1.2rem; }
+  .ballot-header p { margin: 4px 0 0; font-size: 0.82rem; opacity: 0.85; }
+
+  .ballot-body { padding: 24px; }
+
+  .candidate-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--surface2);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--bg);
+  }
+  .candidate-option:hover { border-color: var(--accent); background: var(--surface); }
+  .candidate-option.selected { border-color: var(--accent); background: #eff6ff; }
+  .candidate-option input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+  .candidate-name { font-weight: 700; font-size: 1rem; color: var(--text); }
+
+  .vote-btn-row {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .vote-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  /* Confirmation animation */
+  .voted-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 40px 32px;
+    text-align: center;
+    border: 2px solid var(--green);
+    display: none;
+  }
+  .voted-card .check-anim {
+    font-size: 4rem;
+    animation: pop 0.4s ease;
+    display: block;
+    margin-bottom: 12px;
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .voted-card h2 { color: var(--green); margin: 0 0 8px; }
+  .voted-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+  .signout-link { font-size: 0.8rem; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+<main class="main-content">
+  <div class="breadcrumbs">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span>Election Booth</span>
+  </div>
+
+  <div class="vote-wrap">
+    <!-- Loading -->
+    <div id="stateLoading" class="status-card">
+      <div class="status-icon">⏳</div>
+      <h2>Loading…</h2>
+      <p>Checking election status.</p>
+    </div>
+
+    <!-- Not logged in (fallback, JS will redirect) -->
+    <div id="stateAuth" class="status-card" style="display:none">
+      <div class="status-icon">🔑</div>
+      <h2>Sign In to Vote</h2>
+      <p>You need to log in with your Triumph Academy account to cast a ballot.</p>
+      <a href="learner-login.html?redirect=vote.html" class="btn btn-primary" style="margin-top:20px;display:inline-block;text-decoration:none;">Sign In</a>
+    </div>
+
+    <!-- No active election -->
+    <div id="stateNoElection" class="status-card" style="display:none">
+      <div class="status-icon">🗳️</div>
+      <h2>No Election Active</h2>
+      <p id="noElectionMsg">There is no election currently open for your studio.</p>
+    </div>
+
+    <!-- Already voted -->
+    <div id="stateAlreadyVoted" class="status-card" style="display:none">
+      <div class="status-icon">✅</div>
+      <h2>Already Voted</h2>
+      <p>Your vote has been recorded for this election. Results will be announced after the polls close.</p>
+    </div>
+
+    <!-- Ballot -->
+    <div id="stateBallot" style="display:none">
+      <div class="voter-info">
+        <div>
+          <span class="voter-name" id="voterName"></span>
+          <span class="voter-studio" id="voterStudio"></span>
+        </div>
+        <span class="signout-link" onclick="signOut()">Sign out</span>
+      </div>
+
+      <div class="ballot-card">
+        <div class="ballot-header">
+          <h2>Official Ballot</h2>
+          <p id="ballotStudioLabel">Select one candidate</p>
+        </div>
+        <div class="ballot-body">
+          <div class="vote-error" id="voteError"></div>
+          <div id="candidateList"></div>
+          <div class="vote-btn-row">
+            <button class="btn btn-primary" style="padding:12px 36px;font-size:1rem;" onclick="castVote()" id="voteBtn">
+              Cast My Vote
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voted confirmation -->
+    <div class="voted-card" id="stateVoted">
+      <span class="check-anim">✅</span>
+      <h2>Vote Recorded!</h2>
+      <p>Your ballot has been submitted. Results will be announced when the admin closes the election.</p>
+      <a href="index.html" class="btn btn-secondary" style="margin-top:20px;display:inline-block;text-decoration:none;">Back to Wiki</a>
+    </div>
+  </div>
+</main>
+<script src="nav.js"></script>
+<script>
+  const API = window.location.origin;
+  let learnerToken = localStorage.getItem('learnerToken');
+  let selectedCandidate = null;
+  let currentUser = null;
+
+  function show(id) {
+    ['stateLoading','stateAuth','stateNoElection','stateAlreadyVoted','stateBallot','stateVoted']
+      .forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = s === id ? '' : 'none';
+      });
+  }
+
+  async function init() {
+    if (!learnerToken) {
+      window.location.href = 'learner-login.html?redirect=vote.html';
+      return;
+    }
+
+    // Verify login
+    let meRes;
+    try {
+      meRes = await fetch(`${API}/api/learner/me`, { headers: { 'x-learner-token': learnerToken } });
+    } catch (e) {
+      show('stateAuth');
+      return;
+    }
+    if (!meRes.ok) {
+      localStorage.removeItem('learnerToken');
+      window.location.href = 'learner-login.html?redirect=vote.html';
+      return;
+    }
+    const meData = await meRes.json();
+    currentUser = meData.user;
+
+    // Load election state
+    let elRes;
+    try {
+      elRes = await fetch(`${API}/api/election`);
+    } catch (e) {
+      document.getElementById('noElectionMsg').textContent = 'Could not connect to server.';
+      show('stateNoElection');
+      return;
+    }
+    const election = await elRes.json();
+
+    if (election.phase !== 'voting') {
+      document.getElementById('noElectionMsg').textContent =
+        election.phase === 'results'
+          ? 'This election has closed. Results are being announced.'
+          : 'No election is currently open. Check back later.';
+      show('stateNoElection');
+      return;
+    }
+
+    // Studio check
+    if (election.studio && currentUser.studio && election.studio !== currentUser.studio) {
+      document.getElementById('noElectionMsg').textContent =
+        `This election is for ${election.studio} learners only. Your studio is ${currentUser.studio}.`;
+      show('stateNoElection');
+      return;
+    }
+
+    // Render ballot
+    document.getElementById('voterName').textContent = currentUser.name;
+    document.getElementById('voterStudio').textContent = currentUser.studio ? ` · ${currentUser.studio}` : '';
+    document.getElementById('ballotStudioLabel').textContent =
+      `${election.studio ? election.studio + ' Election' : 'All-Studio Election'} — Select one candidate`;
+
+    const list = document.getElementById('candidateList');
+    list.innerHTML = election.candidates.map(c => `
+      <div class="candidate-option" onclick="selectCandidate(this, '${c.replace(/'/g,"\\'")}')">
+        <input type="radio" name="candidate" value="${c}">
+        <span class="candidate-name">${c}</span>
+      </div>
+    `).join('');
+
+    show('stateBallot');
+  }
+
+  function selectCandidate(el, name) {
+    document.querySelectorAll('.candidate-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+    selectedCandidate = name;
+  }
+
+  async function castVote() {
+    const errEl = document.getElementById('voteError');
+    errEl.style.display = 'none';
+
+    if (!selectedCandidate) {
+      errEl.textContent = 'Please select a candidate before submitting.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('voteBtn').disabled = true;
+    document.getElementById('voteBtn').textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(`${API}/api/election/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-learner-token': learnerToken },
+        body: JSON.stringify({ candidate: selectedCandidate })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        show('stateVoted');
+      } else if (res.status === 400 && data.error && data.error.includes('already voted')) {
+        show('stateAlreadyVoted');
+      } else {
+        errEl.textContent = data.error || 'Failed to submit vote.';
+        errEl.style.display = 'block';
+        document.getElementById('voteBtn').disabled = false;
+        document.getElementById('voteBtn').textContent = 'Cast My Vote';
+      }
+    } catch (e) {
+      errEl.textContent = 'Server error. Please try again.';
+      errEl.style.display = 'block';
+      document.getElementById('voteBtn').disabled = false;
+      document.getElementById('voteBtn').textContent = 'Cast My Vote';
+    }
+  }
+
+  async function signOut() {
+    await fetch(`${API}/api/learner/logout`, {
+      method: 'POST',
+      headers: { 'x-learner-token': learnerToken }
+    }).catch(() => {});
+    ['learnerToken', 'adminToken',
+     'userName', 'userStudio', 'userRole', 'userPositions', 'userPosition',
+     'learnerName', 'learnerStudio'
+    ].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'learner-login.html?redirect=vote.html';
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Other Positions - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<main class="main-content">
+  <div class="breadcrumbs"><a href="index.html">Home</a><span class="sep">/</span><a href="positions.html">Leadership Positions</a><span class="sep">/</span><span>Other Positions</span></div>
+  <h1>Other Positions <span class="badge badge-shared">All Studios</span></h1>
+  <p class="page-desc">Studio Champion and Expo Manager positions at Triumph Academy.</p>
+
+  <div class="position-accordion">
+    <div class="position-card" data-position="MS Studio Champion">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Studio Champion</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-studio-champion">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Only the Studio Champion checks learners off for tasks and goals.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Backup Studio Champion">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Backup Studio Champion</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-backup-studio-champion">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in for the MS Studio Champion when absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Expo Manager">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Expo Manager</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-expo-manager">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Chooses food each session.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="ES Expo Manager">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Expo Manager</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-expo-manager">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Chooses food each session.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="WG Expo Manager">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">WG Expo Manager</span><span class="position-holder-badge" id="holder-wg-expo-manager">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Chooses food each session.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Expo MC">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Expo MC</span><span class="position-holder-badge" id="holder-expo-mc">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"></div>
+    </div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:16px"><strong>Expo Note:</strong> There are always three Expo Managers regardless of enrollment size. Managers choose food each session. Managerial Consultants must have four expos of experience.</div>
+</main>
+<script src="nav.js"></script><script src="amendments.js"></script>
+<script>
+(function() {
+  var POSITIONS_KEY = 'positionHolders';
+  window.togglePosition = function(header) {
+    var card = header.parentElement;
+    var isOpen = card.classList.contains('open');
+    card.parentElement.querySelectorAll('.position-card.open').forEach(function(c) { c.classList.remove('open'); });
+    if (!isOpen) card.classList.add('open');
+  };
+  function loadHolders() { try { var r = localStorage.getItem(POSITIONS_KEY); return r ? JSON.parse(r) : {}; } catch(e) { return {}; } }
+  function renderHolders() {
+    var holders = loadHolders();
+    document.querySelectorAll('.position-card').forEach(function(card) {
+      var position = card.getAttribute('data-position');
+      var badge = card.querySelector('.position-holder-badge');
+      if (!badge) return;
+      var holder = holders[position];
+      if (holder && holder.name) { badge.textContent = holder.name; badge.classList.add('filled'); badge.classList.remove('vacant'); }
+      else { badge.textContent = 'Vacant'; badge.classList.remove('filled'); badge.classList.add('vacant'); }
+    });
+  }
+  window.addEventListener('storage', function(e) { if (e.key === POSITIONS_KEY) renderHolders(); });
+  renderHolders();
+})();
+</script>
+</body></html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Town Hall Secretary - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="main-content">
+  <div class="breadcrumbs">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span>Town Hall Secretary</span>
+  </div>
+
+  <h1>Town Hall Secretary <span class="badge badge-shared">Admin Tool</span></h1>
+  <p class="page-desc">Type notes from Town Hall sessions. AI reads the entire constitution and intelligently adds, removes, or edits rules across all relevant pages.</p>
+
+  <div class="callout callout-info">
+    <strong>How to use:</strong> Type each rule change or decision on its own line (bullets or numbers work too). Click "AI Apply" to have the AI analyze your notes and apply the changes to the correct wiki pages. You can also use "Preview" to see keyword-based categorization first.
+  </div>
+
+  <div class="note-input-area">
+    <label for="notes-input" style="display:block;margin-bottom:8px;font-weight:600;color:var(--text);">
+      Session Notes
+    </label>
+    <textarea
+      id="notes-input"
+      placeholder="Type Town Hall notes here...&#10;&#10;Tips: mention the studio (ES or MS) and the topic (strike, mark, position, etc.)&#10;&#10;Examples:&#10;- ES strikes now require 2 friendly reminders&#10;- MS apology letters must include an action plan&#10;- New leadership position: Lunch Monitor&#10;- Bottle lid LGG is now a warning first&#10;- All studios: no phones during quests"
+    ></textarea>
+
+    <div class="note-actions">
+      <button class="btn btn-secondary" id="clear-btn">Clear All</button>
+      <button class="btn btn-secondary" id="preview-btn">Preview</button>
+      <button class="btn btn-primary" id="ai-apply-btn">🤖 AI Apply</button>
+    </div>
+  </div>
+
+  <div class="preview-section" id="preview-section" style="display:none;">
+    <h3>Categorization Preview</h3>
+    <div id="preview-content"></div>
+  </div>
+
+  <div class="callout callout-info" style="display:none;" id="success-message"></div>
+  <div class="callout callout-warn" style="display:none;" id="error-message"></div>
+</main>
+
+<script src="nav.js"></script>
+<script>
+(function() {
+  var SERVER = window.location.origin;
+
+  // ---- Categorization Engine ----
+  // Two types of keywords:
+  //   phrases  — matched as substrings (e.g. "silent lunch")
+  //   words    — matched with word boundaries so "ES" won't match inside "promises"
+  //
+  // Studio tags ("ES"/"MS") act as multipliers: if a note contains a studio
+  // tag, pages belonging to that studio get a bonus while others get penalized.
+
+  var pageRules = {
+    'es-strikes.html': {
+      studio: 'ES',
+      phrases: [
+        { t: 'regular strike', w: 6 },
+        { t: 'guardrail strike', w: 6 },
+        { t: 'guardrail', w: 4 },
+        { t: 'reset timer', w: 5 },
+        { t: 'blue mark', w: 5 },
+        { t: 'red mark', w: 5 },
+        { t: '5 minute', w: 4 }, { t: '5-minute', w: 4 },
+        { t: '10 minute', w: 4 }, { t: '10-minute', w: 4 },
+        { t: 'fun friday', w: 3 },
+        { t: 'friendly reminder', w: 3 },
+      ],
+      words: [
+        { t: 'strike', w: 4 }, { t: 'strikes', w: 4 },
+        { t: 'mark', w: 3 }, { t: 'marks', w: 3 },
+        { t: 'timer', w: 3 },
+        { t: 'reset', w: 3 },
+        { t: 'refusal', w: 3 },
+      ]
+    },
+    'es-roes.html': {
+      studio: 'ES',
+      phrases: [
+        { t: 'rules of engagement', w: 8 },
+        { t: "hero's promise", w: 8 }, { t: 'heros promise', w: 8 }, { t: 'hero promise', w: 8 },
+        { t: 'socratic', w: 5 },
+        { t: 'core skills', w: 4 },
+        { t: 'classroom conduct', w: 5 },
+        { t: 'free time', w: 3 },
+        { t: 'friendly reminder', w: 3 },
+      ],
+      words: [
+        { t: 'roe', w: 5 }, { t: 'roes', w: 5 },
+        { t: 'behavior', w: 3 }, { t: 'behaviour', w: 3 },
+        { t: 'conduct', w: 3 },
+        { t: 'promise', w: 3 }, { t: 'promises', w: 3 },
+        { t: 'expectations', w: 3 },
+      ]
+    },
+    'ms-strikes.html': {
+      studio: 'MS',
+      phrases: [
+        { t: 'regular strike', w: 6 },
+        { t: 'guardrail strike', w: 6 },
+        { t: 'guardrail', w: 4 },
+        { t: 'silent lunch', w: 8 },
+        { t: 'apology letter', w: 8 },
+        { t: 'low grade guardrail', w: 8 },
+        { t: 'black mark', w: 5 },
+        { t: 'blue mark', w: 4 },
+        { t: 'red mark', w: 4 },
+        { t: 'bottle lid', w: 6 },
+        { t: '30 minute', w: 4 }, { t: '30-minute', w: 4 },
+        { t: 'sign-off', w: 4 }, { t: 'sign off', w: 4 },
+      ],
+      words: [
+        { t: 'lgg', w: 8 },
+        { t: 'strike', w: 4 }, { t: 'strikes', w: 4 },
+        { t: 'mark', w: 3 }, { t: 'marks', w: 3 },
+        { t: 'apology', w: 5 },
+        { t: 'microwave', w: 5 },
+        { t: 'refusal', w: 3 },
+        { t: 'timer', w: 3 },
+      ]
+    },
+    'ms-rules.html': {
+      studio: 'MS',
+      phrases: [
+        { t: 'core skills', w: 5 },
+        { t: 'quest project', w: 6 },
+        { t: 'daily flow', w: 5 },
+        { t: 'morning launch', w: 5 },
+        { t: 'closing circle', w: 5 },
+        { t: 'self-governance', w: 6 }, { t: 'self governance', w: 6 },
+        { t: 'strike champion responsibility', w: 6 },
+      ],
+      words: [
+        { t: 'academics', w: 5 },
+        { t: 'accountability', w: 5 },
+        { t: 'quest', w: 4 }, { t: 'quests', w: 4 },
+        { t: 'squad', w: 4 },
+        { t: 'behavior', w: 3 }, { t: 'behaviour', w: 3 },
+        { t: 'expectations', w: 3 },
+        { t: 'session', w: 2 },
+        { t: 'schedule', w: 3 },
+      ]
+    },
+    'positions.html': {
+      studio: null,
+      phrases: [
+        { t: 'leadership position', w: 10 },
+        { t: 'strike champion', w: 8 },
+        { t: 'position ban', w: 8 },
+        { t: 'position eligibility', w: 8 },
+        { t: 'mark threshold', w: 5 },
+        { t: 'losing position', w: 6 }, { t: 'lose position', w: 6 },
+        { t: 'selection process', w: 5 },
+      ],
+      words: [
+        { t: 'leadership', w: 5 },
+        { t: 'position', w: 4 }, { t: 'positions', w: 4 },
+        { t: 'champion', w: 4 }, { t: 'champions', w: 4 },
+        { t: 'eligibility', w: 4 }, { t: 'eligible', w: 4 }, { t: 'ineligible', w: 4 },
+        { t: 'role', w: 2 }, { t: 'roles', w: 2 },
+        { t: 'nominated', w: 3 }, { t: 'nominate', w: 3 },
+      ]
+    },
+    'shared-roes.html': {
+      studio: null,
+      phrases: [
+        { t: 'rules of engagement', w: 6 },
+        { t: 'all studios', w: 8 },
+        { t: 'both studios', w: 8 },
+        { t: 'every studio', w: 8 },
+        { t: 'safety rule', w: 6 },
+        { t: 'facility rule', w: 6 },
+        { t: 'conflict resolution', w: 6 },
+        { t: 'fun friday', w: 4 },
+        { t: 'no physical', w: 5 },
+        { t: 'no bullying', w: 5 },
+      ],
+      words: [
+        { t: 'shared', w: 5 },
+        { t: 'safety', w: 4 },
+        { t: 'respect', w: 3 },
+        { t: 'kitchen', w: 4 },
+        { t: 'lunchroom', w: 4 },
+        { t: 'facility', w: 3 },
+        { t: 'bullying', w: 4 },
+        { t: 'harassment', w: 4 },
+        { t: 'aggression', w: 3 },
+        { t: 'destruction', w: 3 },
+        { t: 'property', w: 3 },
+      ]
+    }
+  };
+
+  var pageDisplayNames = {
+    'es-strikes.html': 'ES Strike System',
+    'es-roes.html': 'ES Rules of Engagement',
+    'ms-strikes.html': 'MS Strike System',
+    'ms-rules.html': 'MS Academics & Accountability',
+    'positions.html': 'Leadership Positions',
+    'shared-roes.html': 'Shared ROEs'
+  };
+
+  // Word-boundary match: ensures "ES" doesn't match inside "promises"
+  function hasWord(text, word) {
+    var pattern = new RegExp('\\b' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    return pattern.test(text);
+  }
+
+  // Detect studio tags in a note
+  function detectStudios(text) {
+    var studios = [];
+    if (hasWord(text, 'ES') || /\belementary\b/i.test(text)) studios.push('ES');
+    if (hasWord(text, 'MS') || /\bmiddle\s*school\b/i.test(text)) studios.push('MS');
+    return studios;
+  }
+
+  function parseNotes(text) {
+    return text.split('\n')
+      .map(function(line) {
+        return line.trim()
+          .replace(/^[-\u2022*]\s*/, '')
+          .replace(/^\d+[.)]\s*/, '')
+          .trim();
+      })
+      .filter(function(line) { return line.length > 0; });
+  }
+
+  function categorizeNote(noteText) {
+    var lower = noteText.toLowerCase();
+    var studios = detectStudios(noteText);
+    var scores = {};
+
+    for (var page in pageRules) {
+      var rule = pageRules[page];
+      var score = 0;
+
+      // Phrase matches (substring)
+      rule.phrases.forEach(function(kw) {
+        if (lower.indexOf(kw.t) !== -1) score += kw.w;
+      });
+
+      // Word matches (word-boundary)
+      rule.words.forEach(function(kw) {
+        if (hasWord(lower, kw.t)) score += kw.w;
+      });
+
+      // Studio bonus/penalty
+      if (studios.length > 0 && rule.studio) {
+        if (studios.indexOf(rule.studio) !== -1) {
+          // Note mentions this page's studio — big bonus
+          score += 8;
+        } else {
+          // Note mentions a DIFFERENT studio — penalize
+          score = Math.floor(score * 0.3);
+        }
+      }
+
+      scores[page] = score;
+    }
+
+    // Find best match
+    var best = null;
+    var maxScore = 0;
+    for (var p in scores) {
+      if (scores[p] > maxScore) { maxScore = scores[p]; best = p; }
+    }
+
+    return maxScore >= 3 ? best : 'uncategorized';
+  }
+
+  function categorizeAll(notes) {
+    var result = {};
+    notes.forEach(function(note) {
+      var cat = categorizeNote(note);
+      if (!result[cat]) result[cat] = [];
+      result[cat].push(note);
+    });
+    return result;
+  }
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function showPreview(categorized) {
+    var section = document.getElementById('preview-section');
+    var content = document.getElementById('preview-content');
+    var html = '';
+
+    // Categorized notes
+    for (var page in categorized) {
+      if (page === 'uncategorized') continue;
+      html += '<div class="preview-category">' +
+        '<div class="preview-category-name">' + (pageDisplayNames[page] || page) + '</div>' +
+        '<ul class="preview-notes">' +
+        categorized[page].map(function(n) { return '<li>' + escapeHtml(n) + '</li>'; }).join('') +
+        '</ul></div>';
+    }
+
+    // Uncategorized warning
+    if (categorized['uncategorized']) {
+      html += '<div class="uncategorized-warning">' +
+        '<strong>Uncategorized Notes</strong>' +
+        '<p style="margin:6px 0 8px">These couldn\'t be auto-categorized and won\'t be applied. Try adding clearer keywords (e.g. "ES", "MS", "strike", "position").</p>' +
+        '<ul>' +
+        categorized['uncategorized'].map(function(n) { return '<li>' + escapeHtml(n) + '</li>'; }).join('') +
+        '</ul></div>';
+    }
+
+    content.innerHTML = html;
+    section.style.display = html ? 'block' : 'none';
+  }
+
+  // Event listeners
+  document.getElementById('clear-btn').addEventListener('click', function() {
+    if (confirm('Clear all notes?')) {
+      document.getElementById('notes-input').value = '';
+      document.getElementById('preview-section').style.display = 'none';
+      document.getElementById('success-message').style.display = 'none';
+      document.getElementById('error-message').style.display = 'none';
+    }
+  });
+
+  document.getElementById('preview-btn').addEventListener('click', function() {
+    var notes = parseNotes(document.getElementById('notes-input').value);
+    if (notes.length === 0) { alert('Type some notes first.'); return; }
+    showPreview(categorizeAll(notes));
+  });
+
+  document.getElementById('ai-apply-btn').addEventListener('click', async function() {
+    var notes = parseNotes(document.getElementById('notes-input').value);
+    if (notes.length === 0) { alert('Type some notes first.'); return; }
+
+    if (!confirm('Apply ' + notes.length + ' amendment(s) using AI?\n\nThe AI will read the entire constitution and intelligently add, edit, or remove rules on all relevant pages.')) return;
+
+    var btn = document.getElementById('ai-apply-btn');
+    var originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'AI is analyzing…';
+    document.getElementById('preview-section').style.display = 'none';
+    document.getElementById('success-message').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+
+    try {
+      var adminToken = localStorage.getItem('adminToken');
+      var response = await fetch(SERVER + '/api/ai/apply-amendments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ notes: notes })
+      });
+
+      var data = await response.json();
+
+      if (data.success) {
+        document.getElementById('notes-input').value = '';
+
+        var html = '<strong>AI amendments applied!</strong><br>';
+        html += 'Pages updated: ' + (data.pagesModified || []).map(function(pg) {
+          return pageDisplayNames[pg] || pg;
+        }).join(', ') + '<br><br>';
+
+        if (data.results && data.results.length) {
+          html += '<details><summary style="cursor:pointer;font-weight:600;">View details (' + data.results.length + ' changes)</summary><ul style="margin-top:8px;">';
+          data.results.forEach(function(r) {
+            r.pages.forEach(function(pg) {
+              var icon = pg.success ? '✅' : '❌';
+              html += '<li>' + icon + ' <strong>' + escapeHtml(pg.file) + '</strong> — ' + escapeHtml(pg.action) + ': ' + escapeHtml(pg.explanation || '') + '</li>';
+            });
+          });
+          html += '</ul></details>';
+        }
+
+        if (data.uncategorized && data.uncategorized.length > 0) {
+          html += '<br><strong>Skipped:</strong> ' + data.uncategorized.map(function(n) { return escapeHtml(n); }).join(', ');
+        }
+
+        var successEl = document.getElementById('success-message');
+        successEl.innerHTML = html;
+        successEl.style.display = 'block';
+      } else {
+        var errEl = document.getElementById('error-message');
+        errEl.innerHTML = '<strong>Error:</strong> ' + escapeHtml(data.error || 'Could not apply amendments.');
+        errEl.style.display = 'block';
+      }
+
+    } catch (err) {
+      var errEl = document.getElementById('error-message');
+      errEl.innerHTML = '<strong>Network error:</strong> ' + escapeHtml(err.message);
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+})();
+</script>
+</body>
+</html>

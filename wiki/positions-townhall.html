@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Town Hall Positions - Triumph Academy Wiki</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<main class="main-content">
+  <div class="breadcrumbs"><a href="index.html">Home</a><span class="sep">/</span><a href="positions.html">Leadership Positions</a><span class="sep">/</span><span>Town Hall</span></div>
+  <h1>Town Hall Positions <span class="badge badge-shared">All Studios</span></h1>
+  <p class="page-desc">Town Hall leadership roles across Tribe, MS, and ES.</p>
+  <p>Town Hall operates as a Socratic for both ES and MS. Town hall staff must coordinate before each session.</p>
+
+  <div class="position-accordion">
+    <div class="position-card" data-position="Tribe Town Hall Leader">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Tribe Town Hall Leader</span><span class="position-holder-badge" id="holder-tribe-town-hall-leader">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Facilitates whole-school discussions.</li>
+        <li>Enforces Socratic discussion rules.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Backup Tribe Town Hall Leader">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Backup Tribe Town Hall Leader</span><span class="position-holder-badge" id="holder-backup-tribe-town-hall-leader">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Steps in when the primary leader is absent.</li>
+        <li>Must be prepared to step in at any time.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Tribe Town Hall Leader Assistant">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Tribe Town Hall Leader Assistant</span><span class="position-holder-badge" id="holder-tribe-town-hall-leader-assistant">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Helps manage speaking order during discussions.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Tribe Town Hall Secretary">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Tribe Town Hall Secretary</span><span class="position-holder-badge" id="holder-tribe-town-hall-secretary">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Records all notes from each session.</li>
+        <li>Responsible for publishing notes after each session.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Tribe Town Hall Backup Secretary">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Tribe Town Hall Backup Secretary</span><span class="position-holder-badge" id="holder-tribe-town-hall-backup-secretary">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Takes over when the primary secretary is absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="MS Town Hall Leader">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">MS Town Hall Leader</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-town-hall-leader">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Facilitates Middle School sessions.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="Backup MS Town Hall Leader">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">Backup MS Town Hall Leader</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-backup-ms-town-hall-leader">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Fills in for the MS Town Hall Leader when absent.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="ES Town Hall Leader">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Town Hall Leader</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-town-hall-leader">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Runs Elementary Studio town halls.</li>
+      </ul></div>
+    </div>
+
+    <div class="position-card" data-position="ES Town Hall Backup">
+      <div class="position-header" onclick="togglePosition(this)">
+        <div class="position-info"><span class="position-title">ES Town Hall Backup</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-town-hall-backup">Vacant</span></div>
+        <span class="position-arrow">&#9654;</span>
+      </div>
+      <div class="position-body"><h4>Responsibilities</h4><ul>
+        <li>Covers when the primary ES leader is unavailable.</li>
+        <li>Must be prepared to step in at any time.</li>
+      </ul></div>
+    </div>
+  </div>
+</main>
+<script src="nav.js"></script><script src="amendments.js"></script>
+<script>
+(function() {
+  var POSITIONS_KEY = 'positionHolders';
+  window.togglePosition = function(header) {
+    var card = header.parentElement;
+    var isOpen = card.classList.contains('open');
+    card.parentElement.querySelectorAll('.position-card.open').forEach(function(c) { c.classList.remove('open'); });
+    if (!isOpen) card.classList.add('open');
+  };
+  function loadHolders() { try { var r = localStorage.getItem(POSITIONS_KEY); return r ? JSON.parse(r) : {}; } catch(e) { return {}; } }
+  function renderHolders() {
+    var holders = loadHolders();
+    document.querySelectorAll('.position-card').forEach(function(card) {
+      var position = card.getAttribute('data-position');
+      var badge = card.querySelector('.position-holder-badge');
+      if (!badge) return;
+      var holder = holders[position];
+      if (holder && holder.name) { badge.textContent = holder.name; badge.classList.add('filled'); badge.classList.remove('vacant'); }
+      else { badge.textContent = 'Vacant'; badge.classList.remove('filled'); badge.classList.add('vacant'); }
+    });
+  }
+  window.addEventListener('storage', function(e) { if (e.key === POSITIONS_KEY) renderHolders(); });
+  renderHolders();
+})();
+</script>
+</body></html>

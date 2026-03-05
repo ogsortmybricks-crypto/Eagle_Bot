@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triumph Academy - Constitution Wiki</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+  }
+
+  .landing-wrap {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  .landing-logo {
+    width: 90px;
+    margin: 0 auto 16px;
+    display: block;
+    opacity: 0.9;
+  }
+
+  .landing-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+
+  .landing-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 32px;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+    text-align: left;
+  }
+
+  .login-card h2 {
+    color: var(--accent);
+    margin: 0 0 20px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .field-group { margin-bottom: 14px; }
+  .field-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .field-input:focus { border-color: var(--accent); }
+
+  .login-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="landing-wrap">
+  <img src="Eagle_Bot.png" alt="Eagle Bot" class="landing-logo">
+  <div class="landing-title">Triumph Academy</div>
+  <div class="landing-subtitle">Constitution Wiki</div>
+
+  <div class="login-card">
+    <h2>Sign In to Continue</h2>
+
+    <div class="login-error" id="loginError"></div>
+
+    <div class="field-group">
+      <label>Email, Name, or "admin"</label>
+      <input class="field-input" type="text" id="emailInput" placeholder="Email, full name, or admin"
+             onkeydown="if(event.key==='Enter') document.getElementById('pwInput').focus()">
+    </div>
+    <div class="field-group">
+      <label>Password</label>
+      <input class="field-input" type="password" id="pwInput" placeholder="Your password"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doLogin()" id="loginBtn">
+      Sign In
+    </button>
+  </div>
+</div>
+
+<script>
+  const API = window.location.origin;
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get('redirect') || 'index.html';
+
+  // If already logged in, redirect immediately
+  const existingToken = localStorage.getItem('learnerToken');
+  if (existingToken) {
+    fetch(`${API}/api/learner/me`, { headers: { 'x-learner-token': existingToken } })
+      .then(r => { if (r.ok) window.location.href = redirect; })
+      .catch(() => {});
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('emailInput').value.trim();
+    const pw = document.getElementById('pwInput').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+
+    if (!email || !pw) {
+      errEl.textContent = 'Please enter your email/name and password.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('loginBtn').disabled = true;
+    document.getElementById('loginBtn').textContent = 'Signing in…';
+
+    try {
+      const res = await fetch(`${API}/api/learner/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pw })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Store unified session — same keys for admin and learners
+        localStorage.setItem('learnerToken', data.learnerToken);
+        localStorage.setItem('userName', data.user.name);
+        localStorage.setItem('userStudio', data.user.studio || '');
+        localStorage.setItem('userRole', data.user.role || 'learner');
+        localStorage.setItem('userPositions', JSON.stringify(data.user.positions || []));
+        // Admin gets an adminToken so admin-users.html auto-authenticates
+        if (data.adminToken) {
+          localStorage.setItem('adminToken', data.adminToken);
+        }
+        // Clean up any legacy keys from old sessions
+        localStorage.removeItem('learnerName');
+        localStorage.removeItem('learnerStudio');
+        window.location.href = redirect;
+      } else {
+        errEl.textContent = data.error || 'Login failed.';
+        errEl.style.display = 'block';
+        document.getElementById('loginBtn').disabled = false;
+        document.getElementById('loginBtn').textContent = 'Sign In';
+      }
+    } catch (e) {
+      errEl.textContent = 'Could not connect to server.';
+      errEl.style.display = 'block';
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').textContent = 'Sign In';
+    }
+  }
+</script>
+</body>
+</html>
