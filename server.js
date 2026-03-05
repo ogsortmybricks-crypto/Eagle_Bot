@@ -1163,6 +1163,29 @@ app.post('/api/election/vote', async (req, res) => {
 });
 
 // ================================================================
+// POSITION HOLDERS
+// ================================================================
+
+app.get('/api/position-holders', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT name, position FROM users WHERE position IS NOT NULL AND status = $1', ['active']);
+    const holders = {};
+    
+    result.rows.forEach(row => {
+      const positions = parsePositions(row.position);
+      positions.forEach(pos => {
+        holders[pos] = { name: row.name };
+      });
+    });
+    
+    res.json({ holders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ================================================================
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

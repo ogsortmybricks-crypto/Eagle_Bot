@@ -23,7 +23,7 @@
       </ul><p>ES has one Strike Champion and three backup positions.</p></div>
     </div>
 
-    <div class="position-card" data-position="ES Strike Backup #1">
+    <div class="position-card" data-position="ES Strike Champion 1st Backup">
       <div class="position-header" onclick="togglePosition(this)">
         <div class="position-info"><span class="position-title">ES Strike Backup #1</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-1">Vacant</span></div>
         <span class="position-arrow">&#9654;</span>
@@ -33,7 +33,7 @@
       </ul></div>
     </div>
 
-    <div class="position-card" data-position="ES Strike Backup #2">
+    <div class="position-card" data-position="ES Strike Champion 2nd Backup">
       <div class="position-header" onclick="togglePosition(this)">
         <div class="position-info"><span class="position-title">ES Strike Backup #2</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-2">Vacant</span></div>
         <span class="position-arrow">&#9654;</span>
@@ -43,7 +43,7 @@
       </ul></div>
     </div>
 
-    <div class="position-card" data-position="ES Strike Backup #3">
+    <div class="position-card" data-position="ES Strike Champion 3rd Backup">
       <div class="position-header" onclick="togglePosition(this)">
         <div class="position-info"><span class="position-title">ES Strike Backup #3</span><span class="badge badge-es">ES</span><span class="position-holder-badge" id="holder-es-strike-backup-3">Vacant</span></div>
         <span class="position-arrow">&#9654;</span>
@@ -69,7 +69,7 @@
       </ul></div>
     </div>
 
-    <div class="position-card" data-position="MS Strike Backup #1">
+    <div class="position-card" data-position="MS Strike Champion 1st Backup">
       <div class="position-header" onclick="togglePosition(this)">
         <div class="position-info"><span class="position-title">MS Strike Backup #1</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-strike-backup-1">Vacant</span></div>
         <span class="position-arrow">&#9654;</span>
@@ -81,7 +81,7 @@
       </ul></div>
     </div>
 
-    <div class="position-card" data-position="MS Strike Backup #2">
+    <div class="position-card" data-position="MS Strike Champion 2nd Backup">
       <div class="position-header" onclick="togglePosition(this)">
         <div class="position-info"><span class="position-title">MS Strike Backup #2</span><span class="badge badge-ms">MS</span><span class="position-holder-badge" id="holder-ms-strike-backup-2">Vacant</span></div>
         <span class="position-arrow">&#9654;</span>
@@ -96,26 +96,45 @@
 <script src="nav.js"></script><script src="amendments.js"></script>
 <script>
 (function() {
-  var POSITIONS_KEY = 'positionHolders';
   window.togglePosition = function(header) {
     var card = header.parentElement;
     var isOpen = card.classList.contains('open');
     card.parentElement.querySelectorAll('.position-card.open').forEach(function(c) { c.classList.remove('open'); });
     if (!isOpen) card.classList.add('open');
   };
-  function loadHolders() { try { var r = localStorage.getItem(POSITIONS_KEY); return r ? JSON.parse(r) : {}; } catch(e) { return {}; } }
-  function renderHolders() {
-    var holders = loadHolders();
+  
+  async function loadHolders() {
+    try {
+      const response = await fetch('/api/position-holders');
+      if (response.ok) {
+        const data = await response.json();
+        return data.holders || {};
+      }
+    } catch (e) {
+      console.error('Failed to load position holders:', e);
+    }
+    return {};
+  }
+  
+  async function renderHolders() {
+    var holders = await loadHolders();
     document.querySelectorAll('.position-card').forEach(function(card) {
       var position = card.getAttribute('data-position');
       var badge = card.querySelector('.position-holder-badge');
       if (!badge) return;
       var holder = holders[position];
-      if (holder && holder.name) { badge.textContent = holder.name; badge.classList.add('filled'); badge.classList.remove('vacant'); }
-      else { badge.textContent = 'Vacant'; badge.classList.remove('filled'); badge.classList.add('vacant'); }
+      if (holder && holder.name) { 
+        badge.textContent = holder.name; 
+        badge.classList.add('filled'); 
+        badge.classList.remove('vacant'); 
+      } else { 
+        badge.textContent = 'Vacant'; 
+        badge.classList.remove('filled'); 
+        badge.classList.add('vacant'); 
+      }
     });
   }
-  window.addEventListener('storage', function(e) { if (e.key === POSITIONS_KEY) renderHolders(); });
+  
   renderHolders();
 })();
 </script>
