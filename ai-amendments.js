@@ -101,7 +101,10 @@ Important rules:
 - For edits, keep the same HTML structure/formatting style as the existing content
 - If an amendment affects rules mentioned on multiple pages, include changes for ALL affected pages
 - Keep explanations brief
-- If a note is unclear or doesn't relate to any wiki rule, put it in "uncategorized"`
+- If a note is unclear or doesn't relate to any wiki rule, put it in "uncategorized"
+- When removing a position, concept, or rule: scan EVERY page for ALL mentions — including callout notes, eligibility sections, parenthetical references, and any sentence that names it
+- If a mention is embedded inside a larger element (e.g., a callout that also contains other valid content), use action "edit" to remove just that sentence/phrase rather than "remove" (which deletes the whole element)
+- A "remove" action should only be used when the entire element should be deleted; use "edit" with replace set to "" or a trimmed version when only part of the text should go`
     }]
   });
 
@@ -183,12 +186,11 @@ function applyChange(pageName, change) {
       modified = true;
     }
   } else if (change.action === 'remove' && change.find) {
-    const elements = main.querySelectorAll('p, li, tr, div, h3, h4');
+    const elements = [...main.querySelectorAll('p, li, tr, div, h3, h4')];
     for (const el of elements) {
       if (el.textContent.includes(change.find)) {
         el.remove();
         modified = true;
-        break;
       }
     }
   }
