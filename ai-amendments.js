@@ -78,7 +78,7 @@ ${wikiSummary}
 
 Here are the amendment notes from this Town Hall session:
 
-${notes.map((n, i) => `${i + 1}. ${n}`).join('\n')}
+${notes}
 
 ---
 
@@ -228,7 +228,9 @@ function applyChange(pageName, change) {
 }
 
 async function applyAIAmendments(notes, pool) {
-  const analysis = await analyzeAmendments(notes);
+  // notes may be a raw string (from textarea) or an array — normalise to string
+  const notesText = Array.isArray(notes) ? notes.join('\n') : notes;
+  const analysis = await analyzeAmendments(notesText);
   const results = [];
   const pagesModified = new Set();
   const now = new Date().toISOString();

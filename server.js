@@ -455,8 +455,8 @@ app.post('/api/ai/apply-amendments', async (req, res) => {
     if (!(await verifyAdmin(req))) return res.status(403).json({ error: 'Unauthorized' });
     if (!getClient()) return res.status(500).json({ error: 'Anthropic API key not configured' });
     const { notes } = req.body;
-    if (!Array.isArray(notes) || notes.length === 0) {
-      return res.status(400).json({ error: 'Provide an array of amendment notes' });
+    if (!notes || (typeof notes !== 'string' && !Array.isArray(notes)) || notes.length === 0) {
+      return res.status(400).json({ error: 'Provide amendment notes' });
     }
     const result = await applyAIAmendments(notes, pool);
     if (result.pagesModified.length > 0) {

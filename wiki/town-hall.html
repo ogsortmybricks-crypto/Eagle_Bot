@@ -339,10 +339,10 @@
   });
 
   document.getElementById('ai-apply-btn').addEventListener('click', async function() {
-    var notes = parseNotes(document.getElementById('notes-input').value);
+    var notes = document.getElementById('notes-input').value.trim();
     if (notes.length === 0) { alert('Type some notes first.'); return; }
 
-    if (!confirm('Apply ' + notes.length + ' amendment(s) using AI?\n\nThe AI will read the entire constitution and intelligently add, edit, or remove rules on all relevant pages.')) return;
+    if (!confirm('Apply amendments using AI?\n\nThe AI will read the entire constitution and intelligently add, edit, or remove rules on all relevant pages.')) return;
 
     var btn = document.getElementById('ai-apply-btn');
     var originalText = btn.textContent;
