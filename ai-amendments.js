@@ -11,7 +11,8 @@ const CONTENT_PAGES = [
   'ms-strikes.html', 'ms-strike-apology.html', 'ms-strike-lgg.html', 'ms-strike-silent-lunch.html',
   'positions.html', 'positions-eligibility.html', 'positions-townhall.html', 'positions-strike-staff.html', 'positions-other.html',
   'shared-roes.html', 'es-roes.html', 'es-roes-conduct.html', 'es-roes-promise.html', 'ms-roes.html',
-  'shared-kitchen.html', 'shared-phones.html', 'shared-safety.html', 'shared-spaces.html'
+  'shared-kitchen.html', 'shared-phones.html', 'shared-safety.html', 'shared-spaces.html',
+  'index.html'
 ];
 
 function getClient() {
@@ -31,14 +32,27 @@ function extractPageContent(pageName) {
   return main.innerHTML;
 }
 
+function getSearchIndex() {
+  const filePath = path.join(WIKI_DIR, 'index.html');
+  if (!fs.existsSync(filePath)) return null;
+  const html = fs.readFileSync(filePath, 'utf-8');
+  const match = html.match(/const PAGES\s*=\s*\[([\s\S]*?)\];/);
+  if (!match) return null;
+  return match[0].trim();
+}
+
 function buildWikiSummary() {
   const summaries = [];
-  for (const page of CONTENT_PAGES) {
+  for (const page of CONTENT_PAGES.filter(p => p !== 'index.html')) {
     const content = extractPageContent(page);
     if (content) {
       const text = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 6000);
       summaries.push(`[${page}]: ${text}`);
     }
+  }
+  const searchIndex = getSearchIndex();
+  if (searchIndex) {
+    summaries.push(`[index.html search keywords — each entry has a "text" field with keywords used for site search]: ${searchIndex}`);
   }
   return summaries.join('\n\n');
 }
@@ -102,7 +116,7 @@ Important rules:
 - If an amendment affects rules mentioned on multiple pages, include changes for ALL affected pages
 - Keep explanations brief
 - If a note is unclear or doesn't relate to any wiki rule, put it in "uncategorized"
-- When removing a position, concept, or rule: scan EVERY page for ALL mentions — including callout notes, eligibility sections, parenthetical references, and any sentence that names it
+- When removing a position, concept, or rule: scan EVERY page for ALL mentions — including callout notes, eligibility sections, parenthetical references, any sentence that names it, AND the search keyword text fields in index.html
 - If a mention is embedded inside a larger element (e.g., a callout that also contains other valid content), use action "edit" to remove just that sentence/phrase rather than "remove" (which deletes the whole element)
 - A "remove" action should only be used when the entire element should be deleted; use "edit" with replace set to "" or a trimmed version when only part of the text should go`
     }]
@@ -198,6 +212,16 @@ function applyChange(pageName, change) {
   if (modified) {
     fs.writeFileSync(filePath, dom.serialize(), 'utf-8');
     return { success: true };
+  }
+
+  // Fallback: raw text replacement for content inside <script> tags (e.g. index.html search index)
+  if ((change.action === 'edit' || change.action === 'remove') && change.find) {
+    const rawHtml = fs.readFileSync(filePath, 'utf-8');
+    if (rawHtml.includes(change.find)) {
+      const updated = rawHtml.replace(change.find, change.replace || '');
+      fs.writeFileSync(filePath, updated, 'utf-8');
+      return { success: true };
+    }
   }
 
   return { success: false, error: 'Could not locate target content' };
